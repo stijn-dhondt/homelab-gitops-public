@@ -1,0 +1,81 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: n8n
+  namespace: n8n
+spec:
+  interval: 5m
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  chart:
+    spec:
+      chart: n8n
+      version: "2.0.1"
+      sourceRef:
+        kind: HelmRepository
+        name: n8n
+        namespace: flux-system
+
+  values:
+    # The chart's own appVersion lags upstream n8n releases (chart 2.0.1 -> n8n 1.122.4,
+    # while upstream is already past 2.x). Pin the app version here instead of relying on
+    # the chart default, and let Renovate track it directly against Docker Hub - see the
+    # customManagers entry in renovate.json and the "Keeping n8n up to date" section below.
+    image:
+      # renovate: datasource=docker depName=n8nio/n8n versioning=semver-coerced
+      tag: "2.32.3"
+
+    main:
+      config:
+        n8n:
+          host: n8n.lab.example.com
+          protocol: https
+        generic:
+          timezone: Europe/Brussels
+
+      # N8N_ENCRYPTION_KEY must stay stable for the life of the volume - it's what
+      # encrypts stored credentials. Pulled from a SealedSecret instead of
+      # main.secret so the key never sits in git as plaintext.
+      extraEnv:
+        N8N_ENCRYPTION_KEY:
+          valueFrom:
+            secretKeyRef:
+              name: n8n-encryption-key
+              key: encryptionKey
+
+      persistence:
+        enabled: true
+        type: dynamic
+        storageClass: longhorn
+        size: 5Gi
+
+      service:
+        type: ClusterIP
+        port: 80
+
+    ingress:
+      enabled: true
+      className: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        # Forward-auth via Authentik's shared domain-level provider - see
+        # clusters/talos-dev/apps/authentik/README.md ("How apps get protected").
+        nginx.ingress.kubernetes.io/auth-url: "http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/nginx"
+        nginx.ingress.kubernetes.io/auth-signin: "https://n8n.lab.example.com/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri"
+        nginx.ingress.kubernetes.io/auth-response-headers: "Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-entitlements,X-authentik-email,X-authentik-name,X-authentik-uid"
+        nginx.ingress.kubernetes.io/auth-proxy-set-headers: "n8n/authentik-auth-headers"
+      hosts:
+        - host: n8n.lab.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - n8n.lab.example.com
+          secretName: n8n-tls

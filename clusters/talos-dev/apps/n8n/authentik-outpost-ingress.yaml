@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: n8n-authentik-outpost
+  namespace: n8n
+spec:
+  # A second Ingress for the same host as helmrelease.yaml's n8n ingress - ingress-nginx
+  # merges rules across Ingress objects sharing a host, so no separate TLS/cert-manager
+  # config is needed here (the main n8n ingress already provisions the cert for this host).
+  #
+  # The n8n chart's Ingress template hardcodes every path's backend to n8n's own service
+  # (no extraPaths support like the Grafana/Prometheus/Alertmanager charts have), so the
+  # /outpost.goauthentik.io callback path - see the authentik README's "How apps get
+  # protected" - needs its own Ingress instead of a values override.
+  ingressClassName: nginx
+  rules:
+    - host: n8n.lab.example.com
+      http:
+        paths:
+          - path: /outpost.goauthentik.io
+            pathType: Prefix
+            backend:
+              service:
+                name: authentik-outpost
+                port:
+                  number: 80

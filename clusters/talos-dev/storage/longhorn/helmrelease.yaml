@@ -1,0 +1,36 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn
+  namespace: longhorn-system
+spec:
+  interval: 5m
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  chart:
+    spec:
+      chart: longhorn
+      version: "1.12.0"
+      sourceRef:
+        kind: HelmRepository
+        name: longhorn
+        namespace: flux-system
+  values:
+    defaultSettings:
+      defaultDataPath: /var/lib/longhorn
+      replicaAutoBalance: best-effort
+    defaultBackupStore: 
+      backupTarget: "nfs://10.0.50.100:/Longhorn"
+      backupTargetCredentialSecret: ""
+      pollInterval: 300  
+    persistence:
+      defaultClass: false   # keep democratic-csi as default; set true if you want Longhorn default instead
+    csi:
+      attacherReplicaCount: 3
+      provisionerReplicaCount: 3

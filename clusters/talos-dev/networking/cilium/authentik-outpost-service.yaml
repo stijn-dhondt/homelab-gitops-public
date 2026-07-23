@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentik-outpost
+  namespace: kube-system
+spec:
+  # An Ingress can only reference Services in its own namespace - Hubble UI is in
+  # `kube-system`, but Authentik's outpost is in `authentik`. This ExternalName Service
+  # is a DNS alias so ingress.yaml's /outpost.goauthentik.io callback path (see the
+  # authentik README's "How apps get protected") can reach it.
+  type: ExternalName
+  externalName: authentik-server.authentik.svc.cluster.local
+  ports:
+    - port: 80

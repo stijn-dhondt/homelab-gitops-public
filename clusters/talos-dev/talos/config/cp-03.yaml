@@ -1,0 +1,27 @@
+machine:
+  install:
+      disk: /dev/sda # Device to move OS loaded in memory to
+      wipe: true # Should make sense to anyone
+  network:
+    hostname: cp-03
+    interfaces:
+      - interface: enp1s0
+        dhcp: false
+        addresses:
+          - 10.0.20.13/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.0.20.1
+        vip:
+          ip: 10.0.20.10
+        vlans:
+          - vlanId: 40
+            dhcp: false
+            addresses:
+              - 10.0.40.13/24
+          - vlanId: 50
+            dhcp: false
+            addresses:
+              - 10.0.50.13/24
+    nameservers:
+      - 10.0.20.1

@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hubble-ui-api
+  namespace: kube-system
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    # Deliberately NO auth-url/auth-signin/etc here - see ingress.yaml's comment on this
+    # path and the authentik README ("How apps get protected"). Hubble UI's frontend
+    # streams these over a gRPC-Web client that doesn't send cookies, so nginx's
+    # auth_request saw every stream call as unauthenticated and redirected it into the
+    # login flow instead of proxying it - which the frontend can't handle as a stream
+    # response ("Data streams are reconnecting... Failed to fetch").
+    #
+    # Tradeoff, deliberate and accepted: this makes /api/control-stream and
+    # /api/service-map-stream reachable directly (bypassing the Authentik login) to
+    # anyone who can reach hubble.lab.example.com - i.e. anyone on the LAN, since this
+    # isn't internet-exposed. The main page (ingress.yaml's "/") still requires login.
+    # Acceptable here since it's network-flow observability data, not credentials.
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - hubble.lab.example.com
+      secretName: hubble-ui-tls
+  rules:
+    - host: hubble.lab.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: hubble-ui
+                port:
+                  number: 80

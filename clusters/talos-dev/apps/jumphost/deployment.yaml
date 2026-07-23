@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webtop
+  namespace: jumphost
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: webtop
+  template:
+    metadata:
+      labels:
+        app: webtop
+    spec:
+      # Points DNS at the LAN's Pi-hole instead of cluster CoreDNS, so the browser
+      # inside this container resolves *.lab.example.com the same way a real LAN client
+      # does (Pi-hole's split-DNS), and still gets normal internet resolution since
+      # Pi-hole forwards everything else upstream itself.
+      dnsPolicy: "None"
+      dnsConfig:
+        nameservers:
+          - 10.0.10.12
+        options:
+          - name: ndots
+            value: "1"
+      containers:
+        - name: webtop
+          image: lscr.io/linuxserver/webtop:ubuntu-xfce-02239b10-ls287
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: Europe/Brussels
+            - name: TITLE
+              value: Homelab Jumphost
+            # Basic-auth in front of the desktop itself - a second, distinct credential
+            # from Authentik, on the single highest-value target now that it's the one
+            # thing reachable from the public internet. See the jumphost README.
+            - name: CUSTOM_USER
+              valueFrom:
+                secretKeyRef:
+                  name: webtop-credentials
+                  key: username
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: webtop-credentials
+                  key: password
+          ports:
+            - name: http
+              containerPort: 3000
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: dshm
+              mountPath: /dev/shm
+          resources:
+            requests:
+              cpu: 250m
+              memory: 768Mi
+            limits:
+              # 1500Mi OOM-killed this repeatedly in real use (Xfce + Firefox actually
+              # running, not just idle) - confirmed live via `kubectl describe pod`
+              # showing dozens of OOMKilled restarts.
+              memory: 3Gi
+              cpu: "2"
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: webtop-config
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi

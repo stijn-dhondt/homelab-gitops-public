@@ -1,0 +1,190 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: monitoring
+spec:
+  interval: 5m
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: "87.19.0"
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+
+  values:
+    prometheus:
+      prometheusSpec:
+        retention: 31d
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: longhorn
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 5Gi
+        # Watch ServiceMonitors/PodMonitors/PrometheusRules/Probes cluster-wide,
+        # not just ones labeled for this release.
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        ruleSelectorNilUsesHelmValues: false
+        scrapeConfigSelectorNilUsesHelmValues: false
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          # Forward-auth via Authentik's shared domain-level provider - see
+          # clusters/talos-dev/apps/authentik/README.md ("How apps get protected").
+          nginx.ingress.kubernetes.io/auth-url: "http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/nginx"
+          nginx.ingress.kubernetes.io/auth-signin: "https://prometheus.lab.example.com/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri"
+          nginx.ingress.kubernetes.io/auth-response-headers: "Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-entitlements,X-authentik-email,X-authentik-name,X-authentik-uid"
+          nginx.ingress.kubernetes.io/auth-proxy-set-headers: "monitoring/authentik-auth-headers"
+        hosts:
+          - prometheus.lab.example.com
+        paths:
+          - /
+        # forward_single mode's OAuth-style callback happens on the app's own host
+        # (prometheus.lab.example.com), not authentik.lab.example.com - this path has to
+        # reach Authentik's outpost, not Prometheus itself, or the callback 404s.
+        extraPaths:
+          - path: /outpost.goauthentik.io
+            pathType: Prefix
+            backend:
+              service:
+                name: authentik-outpost
+                port:
+                  number: 80
+        tls:
+          - secretName: prometheus-tls
+            hosts:
+              - prometheus.lab.example.com
+
+    alertmanager:
+      alertmanagerSpec:
+        retention: 744h
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: longhorn
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 1Gi
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          # Forward-auth via Authentik's shared domain-level provider - see
+          # clusters/talos-dev/apps/authentik/README.md ("How apps get protected").
+          nginx.ingress.kubernetes.io/auth-url: "http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/nginx"
+          nginx.ingress.kubernetes.io/auth-signin: "https://alertmanager.lab.example.com/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri"
+          nginx.ingress.kubernetes.io/auth-response-headers: "Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-entitlements,X-authentik-email,X-authentik-name,X-authentik-uid"
+          nginx.ingress.kubernetes.io/auth-proxy-set-headers: "monitoring/authentik-auth-headers"
+        hosts:
+          - alertmanager.lab.example.com
+        paths:
+          - /
+        # forward_single mode's OAuth-style callback happens on the app's own host
+        # (alertmanager.lab.example.com), not authentik.lab.example.com - this path has to
+        # reach Authentik's outpost, not Alertmanager itself, or the callback 404s.
+        extraPaths:
+          - path: /outpost.goauthentik.io
+            pathType: Prefix
+            backend:
+              service:
+                name: authentik-outpost
+                port:
+                  number: 80
+        tls:
+          - secretName: alertmanager-tls
+            hosts:
+              - alertmanager.lab.example.com
+
+    grafana:
+      # The persistent volume above is ReadWriteOnce (Longhorn has no RWX class), so a
+      # RollingUpdate's second pod can never attach it while the old pod still holds it
+      # ("Multi-Attach error") - the rollout stalls until ProgressDeadlineExceeded and
+      # Helm marks the upgrade failed. Recreate avoids the two-pod overlap entirely.
+      deploymentStrategy:
+        type: Recreate
+      persistence:
+        enabled: true
+        type: pvc
+        storageClassName: longhorn
+        size: 1Gi
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          # Forward-auth via Authentik's shared domain-level provider - see
+          # clusters/talos-dev/apps/authentik/README.md ("How apps get protected").
+          # auth-url is the in-cluster service, not the public hostname: an external
+          # URL here can clobber headers on the internal auth_request subrequest.
+          nginx.ingress.kubernetes.io/auth-url: "http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/nginx"
+          nginx.ingress.kubernetes.io/auth-signin: "https://grafana.lab.example.com/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri"
+          nginx.ingress.kubernetes.io/auth-response-headers: "Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-entitlements,X-authentik-email,X-authentik-name,X-authentik-uid"
+          nginx.ingress.kubernetes.io/auth-proxy-set-headers: "monitoring/authentik-auth-headers"
+        hosts:
+          - grafana.lab.example.com
+        # forward_single mode's OAuth-style callback happens on the app's own host
+        # (grafana.lab.example.com), not authentik.lab.example.com - this path has to
+        # reach Authentik's outpost, not Grafana itself, or the callback 404s.
+        extraPaths:
+          - path: /outpost.goauthentik.io
+            pathType: Prefix
+            backend:
+              service:
+                name: authentik-outpost
+                port:
+                  number: 80
+        tls:
+          - secretName: grafana-tls
+            hosts:
+              - grafana.lab.example.com
+
+      # True SSO, not just an access gate: nginx already only lets authenticated
+      # requests reach Grafana (see ingress annotations above) and forwards Authentik's
+      # identity as headers on that same request. This tells Grafana to trust those
+      # headers instead of showing its own separate login screen.
+      #
+      # auto_sign_up creates a new Grafana user on first SSO login, defaulting to the
+      # "Viewer" role (standard Grafana behavior for any auth method) - not Admin. The
+      # separate admin/<password in the kube-prometheus-stack-grafana secret> login
+      # still works and is the way to promote an SSO-provisioned user to Admin
+      # afterward, or to get in if Authentik/the ingress is ever having problems.
+      grafana.ini:
+        auth.proxy:
+          enabled: true
+          header_name: X-authentik-username
+          header_property: username
+          auto_sign_up: true
+          headers: "Email:X-authentik-email Name:X-authentik-name Groups:X-authentik-groups"
+
+    # Talos runs etcd as a machine-level service (not a kube-system pod) and binds
+    # kube-controller-manager/kube-scheduler metrics to loopback only, so none of
+    # these are reachable from the pod network without Talos machine-config changes.
+    # Disabled rather than left generating permanently-failing scrape targets.
+    kubeControllerManager:
+      enabled: false
+    kubeScheduler:
+      enabled: false
+    kubeEtcd:
+      enabled: false
+    # Cilium fully replaces kube-proxy (kubeProxyReplacement: true) in this cluster.
+    kubeProxy:
+      enabled: false

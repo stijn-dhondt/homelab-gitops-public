@@ -1,0 +1,104 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik
+  namespace: authentik
+spec:
+  interval: 5m
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  chart:
+    spec:
+      chart: authentik
+      version: "2026.5.6"
+      sourceRef:
+        kind: HelmRepository
+        name: authentik
+        namespace: flux-system
+
+  values:
+    # Config-as-code: the shared domain-level forward-auth Provider/Application/Outpost
+    # binding, applied automatically by Authentik's blueprint discovery. See
+    # blueprint-sso-configmap.yaml and the README's "How apps get protected" section.
+    blueprints:
+      configMaps:
+        - authentik-blueprint-sso
+
+    authentik:
+      log_level: info
+      # secret_key and postgresql.password are intentionally left unset here so the
+      # chart's auto-generated secret doesn't contain them in plaintext. Both are
+      # injected below via global.env instead, from SealedSecrets.
+
+    # Applies to both the server and worker deployments.
+    global:
+      env:
+        # Must stay stable for the life of the database - it's what encrypts
+        # session/cookie signing and derives internal IDs. Rotating it invalidates
+        # every active session and any data it protected.
+        - name: AUTHENTIK_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: authentik-secret-key
+              key: secretKey
+        - name: AUTHENTIK_POSTGRESQL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: authentik-postgresql-credentials
+              key: password
+        # Picked up by Authentik's built-in system bootstrap blueprint
+        # (blueprints/system/bootstrap.yaml), which looks up the akadmin user by
+        # username and attaches a non-expiring API token named
+        # "authentik-bootstrap-token" to it. Safe to add after akadmin already
+        # exists - it's a lookup + attach, not a fresh-install-only action. Used
+        # for config-as-code automation (see the "API access" section below);
+        # not meant for interactive/day-to-day admin login.
+        - name: AUTHENTIK_BOOTSTRAP_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: authentik-bootstrap-token
+              key: token
+
+    server:
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+        hosts:
+          - authentik.lab.example.com
+        tls:
+          - secretName: authentik-tls
+            hosts:
+              - authentik.lab.example.com
+      # Self-hosted application icons (authentik-app-icons-configmap.yaml) - mounted at
+      # the exact path Authentik's media-file serving reads "application-icons/*"
+      # meta_icon values from, confirmed live. See that ConfigMap's own header comment.
+      volumes:
+        - name: app-icons
+          configMap:
+            name: authentik-app-icons
+      volumeMounts:
+        - name: app-icons
+          mountPath: /media/public/application-icons
+
+    # Bundled PostgreSQL (Bitnami subchart) - the only real persistent state here.
+    # Server/worker pods themselves are stateless.
+    postgresql:
+      enabled: true
+      auth:
+        # No remote superuser needed - authentik only ever connects as its own
+        # "authentik" user/database (both chart defaults, matching authentik.postgresql
+        # above).
+        enablePostgresUser: false
+        existingSecret: authentik-postgresql-credentials
+      primary:
+        persistence:
+          storageClass: longhorn
+          size: 5Gi

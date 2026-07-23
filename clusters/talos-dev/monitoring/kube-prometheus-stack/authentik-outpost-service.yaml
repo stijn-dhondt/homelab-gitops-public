@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentik-outpost
+  namespace: monitoring
+spec:
+  # An Ingress can only reference Services in its own namespace - Grafana/Prometheus/
+  # Alertmanager live in `monitoring`, but Authentik's outpost is in the `authentik`
+  # namespace. This ExternalName Service is a DNS alias so their ingresses' extraPaths
+  # (the /outpost.goauthentik.io callback path - see the authentik README's "How apps
+  # get protected") can reach it without crossing namespaces directly.
+  type: ExternalName
+  externalName: authentik-server.authentik.svc.cluster.local
+  ports:
+    - port: 80

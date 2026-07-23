@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-auth-headers
+  namespace: monitoring
+data:
+  # ingress-nginx's auth_request subrequest doesn't forward these by default, and
+  # explicitly blanks X-Forwarded-Proto - Authentik's outpost needs both to know which
+  # app/host is being checked. Referenced via the auth-proxy-set-headers annotation.
+  # Not the auth-snippet annotation: this cluster's ingress-nginx has snippet directives
+  # disabled (see clusters/talos-dev/apps/authentik/README.md, "How apps get protected").
+  #
+  # ingress-nginx does not allow cross-namespace ConfigMap references for this
+  # annotation, so every namespace with a protected app needs its own copy of this
+  # exact ConfigMap (identical content every time).
+  X-Forwarded-Host: "$http_host"
+  X-Forwarded-Proto: "https"

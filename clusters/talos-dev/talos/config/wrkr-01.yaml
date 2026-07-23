@@ -1,0 +1,25 @@
+machine:
+  install:
+      disk: /dev/sda # Device to move OS loaded in memory to
+      wipe: true # Should make sense to anyone
+  network:
+    hostname: wrkr-01
+    interfaces:
+      - interface: enp1s0
+        dhcp: false
+        addresses:
+          - 10.0.20.21/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.0.20.1
+        vlans:
+          - vlanId: 40
+            dhcp: false
+            addresses:
+              - 10.0.40.21/24
+          - vlanId: 50
+            dhcp: false
+            addresses:
+              - 10.0.50.21/24
+    nameservers:
+      - 10.0.20.1

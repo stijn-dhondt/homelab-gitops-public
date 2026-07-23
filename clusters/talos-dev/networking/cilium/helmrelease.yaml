@@ -1,0 +1,99 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  interval: 5m
+  timeout: 5m
+  chart:
+    spec:
+      chart: cilium
+      version: "1.19.6"
+      sourceRef:
+        kind: HelmRepository
+        name: cilium
+        namespace: flux-system
+
+  values:
+    kubeProxyReplacement: true
+    k8sServiceHost: localhost
+    k8sServicePort: 7445
+
+    ipam:
+      mode: kubernetes
+
+    cgroup:
+      autoMount:
+        enabled: false
+      hostRoot: /sys/fs/cgroup
+
+    securityContext:
+      capabilities:
+        ciliumAgent:
+          - CHOWN
+          - KILL
+          - NET_ADMIN
+          - NET_RAW
+          - IPC_LOCK
+          - SYS_ADMIN
+          - SYS_RESOURCE
+          - DAC_OVERRIDE
+          - FOWNER
+          - SETGID
+          - SETUID
+        cleanCiliumState:
+          - NET_ADMIN
+          - SYS_ADMIN
+          - SYS_RESOURCE
+
+    hubble:
+      enabled: true
+      metrics:
+        enabled:
+          - dns
+          - drop
+          - tcp
+          - flow
+          - icmp
+          - http
+        serviceMonitor:
+          enabled: true
+      relay:
+        enabled: true
+        replicas: 2
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        prometheus:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+        tolerations:
+          - key: node-role.kubernetes.io/control-plane
+            operator: Exists
+      ui:
+        enabled: true
+        replicas: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        tolerations:
+          - key: node-role.kubernetes.io/control-plane
+            operator: Exists
+
+    l2announcements:
+      enabled: true
+
+    prometheus:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+
+    operator:
+      replicas: 2
+      prometheus:
+        serviceMonitor:
+          enabled: true

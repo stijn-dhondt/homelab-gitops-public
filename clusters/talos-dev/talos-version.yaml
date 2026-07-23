@@ -1,0 +1,15 @@
+# This file exists purely so Renovate can track the Talos OS version running on the
+# cluster nodes and open a PR when a new siderolabs/talos release ships. Nothing reads
+# or applies this value automatically - it's a version pin/reminder, not a config source.
+#
+# When Renovate bumps this file, it does NOT upgrade the cluster by itself: Talos machine
+# config lives outside Flux's reach (see clusters/talos-dev/talos/README.md) and is only
+# ever applied by hand, via `talosctl upgrade`, using the schematic ID recorded in that
+# folder's README. After merging a bump here, go run the matching `talosctl upgrade`
+# command for each node with the new version.
+#
+# Keep the `# renovate:` comment directly above `talosVersion:`, with no other comment
+# lines in between (blank lines are fine) - the customManager regex in renovate.json
+# requires them adjacent to match.
+# renovate: datasource=github-releases depName=siderolabs/talos
+talosVersion: v1.13.6

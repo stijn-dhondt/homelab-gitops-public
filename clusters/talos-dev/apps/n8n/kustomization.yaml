@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - helmrepository.yaml
+  - n8n-encryption-key-sealed.yaml
+  - authentik-auth-headers-configmap.yaml
+  - authentik-outpost-service.yaml
+  - authentik-outpost-ingress.yaml
+  - helmrelease.yaml

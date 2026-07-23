@@ -1,0 +1,7 @@
+cluster:
+  network:
+    cni:
+      name: none # Make sure default Flannel CNI is not installed. Cilium will replace this part
+  proxy:
+    disabled: true # Don’t run kube-proxy either. Cilium will replace this part
+  allowSchedulingOnControlPlanes: true # this makes sure scheduling pods on the control planes is possible
