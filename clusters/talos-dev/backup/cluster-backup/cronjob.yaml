@@ -38,7 +38,10 @@ spec:
                   readOnly: true
           containers:
             - name: sealed-secrets-key-export
-              image: bitnami/kubectl:1.36
+              # bitnami/kubectl no longer publishes version-pinned tags on the free tier
+              # (only "latest", confirmed live) - rancher/kubectl does, and matches this
+              # cluster's server version (v1.36.0) exactly.
+              image: rancher/kubectl:v1.36.0
               command:
                 - sh
                 - -c
