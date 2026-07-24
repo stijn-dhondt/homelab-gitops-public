@@ -15,6 +15,13 @@ See [security/sealed-secrets/README.md](../clusters/talos-dev/security/sealed-se
 for the backup command (needs re-running periodically, not just once) and the full restore
 procedure onto a new cluster.
 
+## etcd backup
+
+Lower priority than the other items here — see
+[talos/README.md](../clusters/talos-dev/talos/README.md)'s "Backing up and restoring etcd" section
+for why (most of etcd's contents are already reproducible via Flux + this repo) and the actual
+`talosctl etcd snapshot` / `bootstrap --recover-from` commands.
+
 ## NAS: Longhorn backup share permissions
 
 Longhorn's nightly backup job writes to `nfs://10.0.50.100:/Longhorn` (configured in

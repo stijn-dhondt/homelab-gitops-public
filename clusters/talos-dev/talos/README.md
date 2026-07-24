@@ -136,6 +136,47 @@ talosctl upgrade --nodes 10.0.20.13 --image factory.talos.dev/installer/613e1592
 talosctl upgrade --nodes 10.0.20.21 --image factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.13.6
 ```
 
+## Backing up and restoring etcd
+
+Lower priority than the sealed-secrets key or the DNS/NAS items in
+[docs/external-dependencies.md](../../../docs/external-dependencies.md) — almost everything etcd
+holds (every Deployment/Service/HelmRelease/etc.) is already reproducible by letting Flux
+reconcile this repo fresh against a new etcd. Where this actually helps is a *narrower* failure
+mode: etcd itself gets corrupted or lost (e.g. a disk issue on the control-plane nodes) while the
+nodes, Longhorn volumes, and everything else are still intact — restoring a snapshot there is much
+faster than re-provisioning from scratch and waiting for Flux + every Helm chart to reconverge.
+
+**Take a snapshot**, from a client machine, against any healthy control-plane node (all 3 hold
+identical etcd data):
+```bash
+talosctl -n 10.0.20.11 etcd snapshot db.snapshot
+```
+No schedule is configured for this — it's a manual, occasional command, same as the sealed-secrets
+key backup. Store the snapshot file outside the cluster; **do not commit it to git** (it's a raw
+dump of every Kubernetes object, including live Secret contents in plaintext — far more sensitive
+than the encrypted `SealedSecret`s this repo actually tracks).
+
+**Restore**, only after confirming etcd itself (not just one node) is actually broken —
+`talosctl -n <cp-ip> service etcd` and `talosctl -n <cp-ip1>,<cp-ip2>,<cp-ip3> get machinetype`
+first:
+```bash
+# Wipe the ephemeral partition on the control-plane node you're recovering onto:
+talosctl -n 10.0.20.11 reset --graceful=false --reboot --system-labels-to-wipe=EPHEMERAL
+
+# Once etcd shows "Preparing" again on that node, bootstrap from the snapshot:
+talosctl -n 10.0.20.11 bootstrap --recover-from=./db.snapshot
+```
+The other control-plane nodes (`10.0.20.12`, `10.0.20.13`) rejoin the recovered etcd
+automatically. Add `--recover-skip-hash-check` only if the snapshot was copied directly out of
+etcd's data directory (`talosctl cp`) rather than taken via `etcd snapshot` above.
+
+This does **not** cover: Longhorn volume *data* (separate NFS backup job, see
+`storage/longhorn/README.md`), the sealed-secrets decryption key (separate, see
+`security/sealed-secrets/README.md`), or this cluster's own PKI/machine secrets — as noted above,
+`controlplane.yaml`/`worker.yaml`/`talosconfig` are regenerated locally and never committed, so
+there's currently no backup of those either if you want to restore the exact same cluster identity
+rather than bootstrap a new one.
+
 ## Resolved drift
 
 The root README's ["Cluster Deployment"](../../../README.md) section used to show
