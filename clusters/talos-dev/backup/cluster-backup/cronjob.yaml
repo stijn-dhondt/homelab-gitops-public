@@ -39,9 +39,11 @@ spec:
           containers:
             - name: sealed-secrets-key-export
               # bitnami/kubectl no longer publishes version-pinned tags on the free tier
-              # (only "latest", confirmed live) - rancher/kubectl does, and matches this
-              # cluster's server version (v1.36.0) exactly.
-              image: rancher/kubectl:v1.36.0
+              # (only "latest", confirmed live). rancher/kubectl does, but is a minimal
+              # image with no shell at all (confirmed live: "sh": executable file not
+              # found) - can't redirect `kubectl get ... -o yaml` output to a file without
+              # one. alpine/k8s bundles a real Alpine userland alongside kubectl.
+              image: alpine/k8s:1.36.0
               command:
                 - sh
                 - -c
