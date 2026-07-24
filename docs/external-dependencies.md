@@ -11,16 +11,20 @@ against this specific cluster's sealed-secrets keypair — which lives in the cl
 git. Losing it without a backup means every one of those becomes permanently unrecoverable, even
 though the repo still has the (encrypted) files.
 
-See [security/sealed-secrets/README.md](../clusters/talos-dev/security/sealed-secrets/README.md)
-for the backup command (needs re-running periodically, not just once) and the full restore
-procedure onto a new cluster.
+Backup is now automated nightly (via
+[backup/cluster-backup](../clusters/talos-dev/backup/cluster-backup/README.md), no need to remember
+to re-run anything by hand. See
+[security/sealed-secrets/README.md](../clusters/talos-dev/security/sealed-secrets/README.md) for
+the manual/ad-hoc version of the same backup and the full restore procedure onto a new cluster.
 
 ## etcd backup
 
 Lower priority than the other items here — see
 [talos/README.md](../clusters/talos-dev/talos/README.md)'s "Backing up and restoring etcd" section
-for why (most of etcd's contents are already reproducible via Flux + this repo) and the actual
-`talosctl etcd snapshot` / `bootstrap --recover-from` commands.
+for why (most of etcd's contents are already reproducible via Flux + this repo). The backup side is
+now automated (nightly, via [backup/cluster-backup](../clusters/talos-dev/backup/cluster-backup/README.md));
+the restore side (`bootstrap --recover-from`) is still a manual procedure, documented in the same
+`talos/README.md` section.
 
 ## NAS: Longhorn backup share permissions
 

@@ -146,15 +146,19 @@ mode: etcd itself gets corrupted or lost (e.g. a disk issue on the control-plane
 nodes, Longhorn volumes, and everything else are still intact — restoring a snapshot there is much
 faster than re-provisioning from scratch and waiting for Flux + every Helm chart to reconverge.
 
+**This is now automated** — `backup/cluster-backup`'s `CronJob` takes a snapshot every night at
+`01:00` and writes it onto a Longhorn-backed PVC, which then rides Longhorn's own nightly NAS
+backup (see that folder's README for the full design). What follows is the manual, one-off version
+of the same command, for ad-hoc use between scheduled runs.
+
 **Take a snapshot**, from a client machine, against any healthy control-plane node (all 3 hold
 identical etcd data):
 ```bash
 talosctl -n 10.0.20.11 etcd snapshot db.snapshot
 ```
-No schedule is configured for this — it's a manual, occasional command, same as the sealed-secrets
-key backup. Store the snapshot file outside the cluster; **do not commit it to git** (it's a raw
-dump of every Kubernetes object, including live Secret contents in plaintext — far more sensitive
-than the encrypted `SealedSecret`s this repo actually tracks).
+Store the snapshot file outside the cluster; **do not commit it to git** (it's a raw dump of every
+Kubernetes object, including live Secret contents in plaintext — far more sensitive than the
+encrypted `SealedSecret`s this repo actually tracks).
 
 **Restore**, only after confirming etcd itself (not just one node) is actually broken —
 `talosctl -n <cp-ip> service etcd` and `talosctl -n <cp-ip1>,<cp-ip2>,<cp-ip3> get machinetype`

@@ -22,6 +22,13 @@ controller to be available.
 If the cluster is ever wiped and this key is lost, every `SealedSecret` already committed to git
 becomes permanently undecryptable — there's no recovery path.
 
+**This is now automated** — `backup/cluster-backup`'s `CronJob` exports every current key (same
+label selector as below) every night at `01:00`, onto a Longhorn-backed PVC that rides Longhorn's
+own nightly NAS backup, so it's refreshed automatically without relying on remembering to re-run a
+command by hand. See that folder's README for the full design and how to retrieve a copy. What
+follows is the manual, one-off version, for ad-hoc use or if you want a copy somewhere other than
+the automated path:
+
 ```bash
 kubectl get secret -n sealed-secrets -l sealedsecrets.bitnami.com/sealed-secrets-key -o yaml > sealed-secrets-key-backup.yaml
 ```
@@ -29,13 +36,12 @@ kubectl get secret -n sealed-secrets -l sealedsecrets.bitnami.com/sealed-secrets
 Store this file outside the cluster (password manager, encrypted USB). **Never commit it to git**
 — it's already in this repo's `.gitignore` by name, but double-check before ever adding it anywhere.
 
-**This isn't a one-time task — repeat it periodically.** The controller rotates in a new active
-key on its own schedule (confirmed live: two keys currently exist, about a month apart), and every
-key is kept forever so secrets sealed under an older key stay decryptable. The `-l` selector above
-already grabs *all* keys that exist at backup time, but a backup taken before a rotation won't
-contain a key created after it — anything sealed with that newer key would have no recovery path
-until the next backup. Re-run the command above every so often (e.g. whenever you touch a
-`SealedSecret`, or on a calendar reminder) and overwrite the stored copy.
+**If you do rely on manual copies instead of (or alongside) the automated one, repeat it
+periodically** — the controller rotates in a new active key on its own schedule (confirmed live:
+two keys currently exist, about a month apart), and every key is kept forever so secrets sealed
+under an older key stay decryptable. The `-l` selector above already grabs *all* keys that exist at
+backup time, but a backup taken before a rotation won't contain a key created after it. The
+automated nightly job doesn't have this problem — it's simply re-run every night.
 
 ## Restoring onto a new cluster
 

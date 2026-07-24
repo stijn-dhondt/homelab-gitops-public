@@ -1,0 +1,56 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cluster-backup
+  namespace: cluster-backup
+spec:
+  # An hour before Longhorn's own nightly-backup RecurringJob (0 2 * * *, see
+  # storage/longhorn) - this volume is plain `longhorn`-class, so it's automatically in that
+  # job's "default" group and gets its own point-in-time NAS backup + 14-day retention for
+  # free. Both containers below overwrite fixed filenames each run - no retention logic
+  # needed here, Longhorn's nightly backup is what actually preserves history.
+  schedule: "0 1 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: cluster-backup
+          restartPolicy: Never
+          initContainers:
+            - name: etcd-snapshot
+              image: ghcr.io/siderolabs/talosctl:v1.13.6
+              command:
+                - talosctl
+                - --talosconfig=/talos/talosconfig
+                - -n
+                - "10.0.20.11"
+                - etcd
+                - snapshot
+                - /backup/db.snapshot
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+                - name: talosconfig
+                  mountPath: /talos
+                  readOnly: true
+          containers:
+            - name: sealed-secrets-key-export
+              image: bitnami/kubectl:1.36
+              command:
+                - sh
+                - -c
+                - |
+                  set -eu
+                  kubectl get secret -n sealed-secrets \
+                    -l sealedsecrets.bitnami.com/sealed-secrets-key \
+                    -o yaml > /backup/sealed-secrets-key-backup.yaml
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+          volumes:
+            - name: backup
+              persistentVolumeClaim:
+                claimName: cluster-backup-data
+            - name: talosconfig
+              secret:
+                secretName: talos-backup-credentials
