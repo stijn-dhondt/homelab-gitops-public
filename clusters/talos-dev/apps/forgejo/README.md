@@ -67,7 +67,8 @@ actual username/password/email are not recoverable from git, only from the live 
 whoever was given the generated password at creation time).
 
 **Log in and change the password immediately** if you haven't already — Site Administration → User
-Accounts, or your own profile settings once logged in as `admin`.
+Accounts, or your own profile settings once logged in as `gitea_admin` (not `admin` — that username
+is reserved by Forgejo itself and the bootstrap job fails with `name is reserved` if you try it).
 
 **Retrieve the current sealed value** (only works if it hasn't been rotated since):
 ```bash
