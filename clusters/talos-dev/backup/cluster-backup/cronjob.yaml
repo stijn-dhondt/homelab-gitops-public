@@ -19,8 +19,11 @@ spec:
           initContainers:
             - name: etcd-snapshot
               image: ghcr.io/siderolabs/talosctl:v1.13.6
-              command:
-                - talosctl
+              # No `command:` override - this image's ENTRYPOINT is already the talosctl
+              # binary itself (confirmed live; "talosctl" isn't a separate resolvable name on
+              # $PATH inside it, so overriding command to literally "talosctl" 404s with
+              # "executable file not found").
+              args:
                 - --talosconfig=/talos/talosconfig
                 - -n
                 - "10.0.20.11"
