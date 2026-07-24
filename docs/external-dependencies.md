@@ -3,6 +3,18 @@
 _Added 2026-07-21 — things that live outside this repo and won't come back by just redeploying the
 cluster from git._
 
+## Sealed-secrets encryption key
+
+Every `*-sealed.yaml` in this repo (n8n's encryption key, Authentik's secrets, WordPress's
+credentials, Forgejo's admin credentials, the Cloudflare Tunnel credentials, etc.) only decrypts
+against this specific cluster's sealed-secrets keypair — which lives in the cluster itself, not in
+git. Losing it without a backup means every one of those becomes permanently unrecoverable, even
+though the repo still has the (encrypted) files.
+
+See [security/sealed-secrets/README.md](../clusters/talos-dev/security/sealed-secrets/README.md)
+for the backup command (needs re-running periodically, not just once) and the full restore
+procedure onto a new cluster.
+
 ## NAS: Longhorn backup share permissions
 
 Longhorn's nightly backup job writes to `nfs://10.0.50.100:/Longhorn` (configured in
@@ -53,6 +65,7 @@ redeploy — the tunnel ID and secret live in `cloudflare-tunnel-credentials-sea
 | `n8n.lab.example.com` | `10.0.40.100` |
 | `authentik.lab.example.com` | `10.0.40.100` |
 | `hubble.lab.example.com` | `10.0.40.100` |
+| `forgeo.lab.example.com` | `10.0.40.100` |
 
 These exist purely so LAN clients hit the ingress VIP directly instead of round-tripping through
 the Cloudflare tunnel. Rebuilding onto new infrastructure (new NAS, new Pi-hole instance, etc.)

@@ -29,6 +29,49 @@ kubectl get secret -n sealed-secrets -l sealedsecrets.bitnami.com/sealed-secrets
 Store this file outside the cluster (password manager, encrypted USB). **Never commit it to git**
 — it's already in this repo's `.gitignore` by name, but double-check before ever adding it anywhere.
 
+**This isn't a one-time task — repeat it periodically.** The controller rotates in a new active
+key on its own schedule (confirmed live: two keys currently exist, about a month apart), and every
+key is kept forever so secrets sealed under an older key stay decryptable. The `-l` selector above
+already grabs *all* keys that exist at backup time, but a backup taken before a rotation won't
+contain a key created after it — anything sealed with that newer key would have no recovery path
+until the next backup. Re-run the command above every so often (e.g. whenever you touch a
+`SealedSecret`, or on a calendar reminder) and overwrite the stored copy.
+
+## Restoring onto a new cluster
+
+This is what actually makes the backup useful — without it, every `*-sealed.yaml` already in this
+repo (n8n's encryption key, Authentik's secret key/DB password/bootstrap token, WordPress's
+credentials, Forgejo's admin credentials, the Cloudflare Tunnel credentials, everything) is
+permanently unrecoverable, since none of their plaintext values live in git.
+
+1. Let Flux bootstrap the new cluster normally, including this `sealed-secrets` HelmRelease — the
+   controller will auto-generate a **fresh** key pair on first start, same as any new install.
+2. Restore the backed-up key(s) on top of it:
+   ```bash
+   kubectl apply -f sealed-secrets-key-backup.yaml
+   kubectl delete pod -n sealed-secrets -l app.kubernetes.io/name=sealed-secrets
+   ```
+   The `apply` recreates the old key `Secret`(s) alongside the freshly auto-generated one; deleting
+   the pod restarts the controller so it re-reads every key currently in the namespace, not just the
+   one it generated at startup.
+3. Confirm it worked — force any single `SealedSecret` to re-decrypt and check the resulting
+   `Secret` has real content, not empty:
+   ```bash
+   kubectl annotate sealedsecrets n8n-encryption-key -n n8n \
+     sealedsecrets.bitnami.com/trigger-reconcile="$(date +%s)" --overwrite
+   kubectl get secret n8n-encryption-key -n n8n -o jsonpath='{.data.encryptionKey}' | base64 -d; echo
+   ```
+   If that prints the real key instead of erroring, every other `SealedSecret` in the repo will
+   decrypt too — they all depend on the exact same restored keypair(s).
+4. The controller now has both the restored (old) key(s) and the extra freshly-generated one from
+   step 1 — harmless. It'll use whichever is newest for sealing anything new going forward, and can
+   still decrypt anything sealed under an older one.
+
+The commands above match this cluster's actual setup (Helm-deployed, `sealed-secrets` namespace,
+`app.kubernetes.io/name=sealed-secrets` pod label) — confirmed live rather than copied blind from
+[upstream's generic backup/restore docs](https://github.com/bitnami-labs/sealed-secrets#how-can-i-do-a-backup-of-my-sealedsecrets-encryption-keys),
+which default to `kube-system` and a different label.
+
 ## Sealing a secret
 
 The general workflow — pipe a dry-run Secret through `kubeseal` to produce a `SealedSecret` YAML:
