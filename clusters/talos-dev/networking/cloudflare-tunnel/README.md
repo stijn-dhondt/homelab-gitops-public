@@ -56,33 +56,63 @@ only allows VLAN 20 into those two for narrow specific ports (DHCP/TFTP, NFS/iSC
 intentional, unchanged segmentation, not a gap to route around.
 
 `warp-routing: enabled: true` in `cloudflared-configmap.yaml` is the only in-repo piece. Everything
-else is Cloudflare **account-level** configuration — not reproducible from git, same category as the
-tunnel's own credentials (see [Setting up the tunnel](#setting-up-the-tunnel-not-in-git) above):
+else is Cloudflare **account-level** configuration (and one Unifi firewall rule) — not reproducible
+from git, same category as the tunnel's own credentials (see
+[Setting up the tunnel](#setting-up-the-tunnel-not-in-git) above).
+
+**Private network routes currently registered against this tunnel** (`cloudflared tunnel route ip
+show`) — the CLI needs `cloudflared tunnel login` against this account first, or use the Zero Trust
+dashboard instead (Networks → Tunnels → this tunnel → Private Network → Add a route). Comment is
+the third positional argument, not a `--comment` flag:
+```bash
+cloudflared tunnel route ip add 10.0.20.0/24 homelab-2 "Talos cluster"
+cloudflared tunnel route ip add 10.0.40.0/24 homelab-2 "Services/Ingress"
+cloudflared tunnel route ip add 10.0.10.12/32 homelab-2 "Pi-hole DNS"
+```
+That third route is deliberately a `/32` (Pi-hole's exact IP), **not** `10.0.10.0/24` — the
+latter would be the entire Management VLAN (NAS admin, PXE booter, switch VIP, everything else that
+ever lands there), which defeats the point of keeping this scoped to "cluster + apps" plus just
+enough DNS to make `*.lab.example.com` hostnames resolve. Registering the route is only step one,
+though — three more pieces are needed for that DNS resolution to actually work, none of them
+in-repo:
 
 1. **Zero Trust must be enabled** on the Cloudflare account (free tier, up to 50 users) — the
    Zero Trust dashboard prompts for this on first visit if not already done.
-2. **Register the private network routes** against this tunnel, either via the Zero Trust dashboard
-   (Networks → Tunnels → this tunnel → Private Network → Add a route) or the CLI (needs
-   `cloudflared tunnel login` against this account first):
-   ```bash
-   cloudflared tunnel route ip add 10.0.20.0/24 <tunnel-name-or-UUID>
-   cloudflared tunnel route ip add 10.0.40.0/24 <tunnel-name-or-UUID>
-   ```
-3. **Set up at least one Access policy** (Zero Trust → Access → Policies) — WARP client
+2. **Set up at least one Access policy** (Zero Trust → Access → Policies) — WARP client
    enrollment requires an identity/authentication method (e.g. one-time PIN to your own email is
    the simplest for single-user use).
-4. **Install the WARP client** on any device that needs this access, log it into this Zero Trust
-   organization, and switch its mode from the default "1.1.1.1 (DNS only)" to **"Gateway with
-   WARP"** — the DNS-only mode does not route any private-network traffic at all.
-5. **Restart the tunnel deployment** after changing `warp-routing` (config isn't hot-reloaded, see
+3. **Install the WARP client**, log it into this Zero Trust organization, and switch its mode from
+   the default "1.1.1.1 (DNS only)" to **"Gateway with WARP"** — DNS-only mode routes nothing.
+4. **Add all three CIDRs above to the WARP Client's Split Tunnel Include list** (Zero Trust →
+   Settings → WARP Client → Device settings profiles → your profile → Split Tunnels). This is a
+   *separate* setting from the tunnel routes above — the tunnel routes tell Cloudflare's edge what's
+   reachable through this tunnel at all; Split Tunnel decides what the client actually sends into
+   WARP in the first place. Confirmed live: a route existing here without also being in this list is
+   silently never used — no error, the traffic just goes direct and fails.
+5. **Add a Gateway DNS Resolver Policy** (Zero Trust → Gateway → Firewall Policies → DNS, or
+   Resolver Policies depending on dashboard version) so queries for `lab.example.com` resolve via
+   `10.0.10.12` (Pi-hole) instead of Cloudflare's own default Gateway resolver — otherwise every
+   `*.lab.example.com` hostname returns NXDOMAIN over this connection even once routing itself works.
+6. **Add a Unifi firewall rule**: `VLAN 20 (K8s) → 10.0.10.12, port 53 (DNS), Allow` — same
+   narrow-rule pattern as the existing table in
+   [docs/network.md](../../../../docs/network.md)'s "Network Policies". Without this, the DNS
+   query leaves `cloudflared`'s pod (effectively VLAN 20) but the router drops it before it reaches
+   Pi-hole, since VLAN 20 → VLAN 10 currently only allows DHCP/TFTP ports (67/68/69).
+7. **Restart the tunnel deployment** after changing `warp-routing` (config isn't hot-reloaded, see
    [Common tasks](#common-tasks) below):
    ```bash
    kubectl rollout restart deployment/cloudflare-tunnel -n cloudflare-tunnel
    ```
 
-**Verify it works:** with WARP connected in Gateway mode, `curl https://grafana.lab.example.com` (or
-any other `*.lab.example.com` host) or `talosctl -n 10.0.20.11 version` should succeed from
-anywhere with internet access, no LAN/prior VPN required.
+**Verify it works:** `warp-cli settings` should show all three CIDRs under "Include mode" — if any
+are missing there, that's the most common silent failure (see point 4 above), regardless of what
+`cloudflared tunnel route ip show` says. Once confirmed, with WARP connected in Gateway mode:
+`talosctl -n 10.0.20.11 version` (VLAN 20), `curl https://10.0.40.100` (VLAN 40, expect a
+`404` from ingress-nginx's default backend if hit without a matching Host header — that's success,
+not failure), and `curl https://grafana.lab.example.com` (needs steps 5+6 above too) should all work
+from anywhere with internet access, no LAN/prior VPN required. `ping`/ICMP will never work through
+this path — Cloudflare Tunnel's WARP routing only proxies TCP/UDP — that's expected, not a sign
+something's broken.
 
 ## Common tasks
 

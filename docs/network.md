@@ -115,12 +115,15 @@ Apply these firewall rules on Unifi to enforce traffic flow:
 | VLAN 10 (Mgmt) | VLAN 20 (K8s) | 22, 50000 | Allow | SSH & Talos API |
 | VLAN 20 (K8s) | VLAN 50 (Storage) | 111, 2049, 3260 | Allow | NFS/iSCSI for persistent volumes |
 | VLAN 20 (K8s) | VLAN 10 (Management) | 67, 68, 69 | Allow | DHCP/TFTP for PXE boot |
+| VLAN 20 (K8s) | `10.0.10.12` (Pi-hole) | 53 | Allow | DNS for `*.lab.example.com` over WARP remote access — see below |
 | External | VLAN 20 (K8s) | None | Deny | Block direct cluster access |
 
-**Remote access (WARP):** Cloudflare Zero Trust WARP routes remote clients into VLAN 20 + VLAN 40
-through the existing Cloudflare Tunnel (see
+**Remote access (WARP):** Cloudflare Zero Trust WARP routes remote clients into VLAN 20 + VLAN 40,
+plus a `/32` route to Pi-hole itself (`10.0.10.12`, DNS only — not the rest of VLAN 10), through
+the existing Cloudflare Tunnel (see
 [networking/cloudflare-tunnel/README.md](../clusters/talos-dev/networking/cloudflare-tunnel/README.md)'s
 "Remote access via Cloudflare WARP") — chosen over a router-hosted VPN because Starlink's CGNAT
 blocks any inbound connection to the router. That traffic still enters at VLAN 20, so it's subject
-to every rule in the table above — it does **not** get VLAN 10/50 access beyond what's already
-listed here.
+to every rule in the table above, including the narrow Pi-hole DNS one added specifically to support
+this — it does **not** get any other VLAN 10 access (NAS admin, PXE booter, etc.) or VLAN 50 access
+beyond what's already listed here.
