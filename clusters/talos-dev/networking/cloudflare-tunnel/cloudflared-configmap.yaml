@@ -9,6 +9,12 @@ data:
     credentials-file: /etc/cloudflared/tunnel.json
     loglevel: info
     no-autoupdate: true
+    # Lets WARP clients (Cloudflare Zero Trust remote access) route traffic through this
+    # same tunnel to private IP ranges - see the "Remote access via Cloudflare WARP"
+    # section of this folder's README. Separate from, and doesn't change, the public
+    # hostname ingress rules below.
+    warp-routing:
+      enabled: true
     ingress:
       - hostname: example.com
         service: https://ingress-nginx-controller.ingress-nginx.svc.cluster.local:443

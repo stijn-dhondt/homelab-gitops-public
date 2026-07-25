@@ -37,6 +37,53 @@ As long as the same tunnel is reused (not deleted and recreated) across a cluste
 public DNS records in [docs/external-dependencies.md](../../../../docs/external-dependencies.md)
 keep working unchanged — only the credentials secret needs restoring.
 
+## Remote access via Cloudflare WARP
+
+Added because the homelab is behind Starlink's CGNAT — no public IP means a router-hosted VPN
+(WireGuard/UniFi Teleport/etc.) can't work, since nothing could open an inbound connection to it.
+This tunnel already proves outbound-only connectivity works fine through that CGNAT (it's how
+`example.com`/`jump.example.com` are reachable at all), so remote LAN access reuses it instead of
+standing up new infrastructure: Cloudflare Zero Trust's WARP client routes matching traffic through
+this same tunnel to specific private IP ranges, rather than only proxying the public hostnames
+above.
+
+**Deliberately scoped to VLAN 20 (Talos cluster) + VLAN 40 (Services/Ingress) only** —
+`10.0.20.0/24` and `10.0.40.0/24` — covering the cluster nodes (`kubectl`/`talosctl`/SSH) and
+every `*.lab.example.com` app (all resolve into the `10.0.40.0/24` range). **Not** VLAN 10
+(Management: Pi-hole, NAS admin) or VLAN 50 (Storage) beyond what's already routed — the existing
+Unifi firewall policy (see [docs/network.md](../../../../docs/network.md)'s "Network Policies")
+only allows VLAN 20 into those two for narrow specific ports (DHCP/TFTP, NFS/iSCSI), and that's
+intentional, unchanged segmentation, not a gap to route around.
+
+`warp-routing: enabled: true` in `cloudflared-configmap.yaml` is the only in-repo piece. Everything
+else is Cloudflare **account-level** configuration — not reproducible from git, same category as the
+tunnel's own credentials (see [Setting up the tunnel](#setting-up-the-tunnel-not-in-git) above):
+
+1. **Zero Trust must be enabled** on the Cloudflare account (free tier, up to 50 users) — the
+   Zero Trust dashboard prompts for this on first visit if not already done.
+2. **Register the private network routes** against this tunnel, either via the Zero Trust dashboard
+   (Networks → Tunnels → this tunnel → Private Network → Add a route) or the CLI (needs
+   `cloudflared tunnel login` against this account first):
+   ```bash
+   cloudflared tunnel route ip add 10.0.20.0/24 <tunnel-name-or-UUID>
+   cloudflared tunnel route ip add 10.0.40.0/24 <tunnel-name-or-UUID>
+   ```
+3. **Set up at least one Access policy** (Zero Trust → Access → Policies) — WARP client
+   enrollment requires an identity/authentication method (e.g. one-time PIN to your own email is
+   the simplest for single-user use).
+4. **Install the WARP client** on any device that needs this access, log it into this Zero Trust
+   organization, and switch its mode from the default "1.1.1.1 (DNS only)" to **"Gateway with
+   WARP"** — the DNS-only mode does not route any private-network traffic at all.
+5. **Restart the tunnel deployment** after changing `warp-routing` (config isn't hot-reloaded, see
+   [Common tasks](#common-tasks) below):
+   ```bash
+   kubectl rollout restart deployment/cloudflare-tunnel -n cloudflare-tunnel
+   ```
+
+**Verify it works:** with WARP connected in Gateway mode, `curl https://grafana.lab.example.com` (or
+any other `*.lab.example.com` host) or `talosctl -n 10.0.20.11 version` should succeed from
+anywhere with internet access, no LAN/prior VPN required.
+
 ## Common tasks
 
 **Add a new publicly-exposed hostname:** add an `ingress:` entry to `cloudflared-configmap.yaml`
