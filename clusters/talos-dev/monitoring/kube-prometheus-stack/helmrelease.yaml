@@ -33,7 +33,11 @@ spec:
               accessModes: ["ReadWriteOnce"]
               resources:
                 requests:
-                  storage: 5Gi
+                  # Grown from 5Gi on 2026-07-25 - kubelet-reported usage was at ~70%
+                  # (3.67Gi/5Gi) and climbing, with 31d retention and scrape targets
+                  # added over time (cert-manager, ingress-nginx, Cilium, Longhorn,
+                  # MariaDB). Longhorn resizes online, no downtime.
+                  storage: 10Gi
         # Watch ServiceMonitors/PodMonitors/PrometheusRules/Probes cluster-wide,
         # not just ones labeled for this release.
         serviceMonitorSelectorNilUsesHelmValues: false

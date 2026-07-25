@@ -101,3 +101,22 @@ kubectl logs -n monitoring -l app.kubernetes.io/name=grafana -c grafana-sc-dashb
 ```bash
 kubectl get configmap -A -l grafana_dashboard=1
 ```
+
+**Check Prometheus's actual disk usage** — don't trust the Longhorn dashboard's "Volume Capacity"
+panel for this (see that dashboard's own gotcha, in `storage/longhorn/README.md`, about it scaling
+relative to the largest volume in the cluster rather than showing real usage). Use kubelet's own
+volume stats instead, the same source `df` would show:
+```promql
+kubelet_volume_stats_used_bytes{persistentvolumeclaim=~"prometheus-.*"}
+kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~"prometheus-.*"}
+```
+
+**Grow Prometheus's storage** (Longhorn's `allowVolumeExpansion` is enabled, so this is
+online/non-disruptive) — grown from 5Gi to 10Gi on 2026-07-25 after kubelet reported ~70% used:
+```yaml
+# helmrelease.yaml, under prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests
+storage: 20Gi  # bump this
+```
+Push the change; Flux/Helm resizes the PVC in place. Worth revisiting if usage keeps climbing —
+`retention: 31d` means it grows continuously with scrape target count/cardinality, not something
+that plateaus on its own.
