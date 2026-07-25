@@ -76,7 +76,7 @@ redeploy — the tunnel ID and secret live in `cloudflare-tunnel-credentials-sea
 | `n8n.lab.example.com` | `10.0.40.100` |
 | `authentik.lab.example.com` | `10.0.40.100` |
 | `hubble.lab.example.com` | `10.0.40.100` |
-| `forgeo.lab.example.com` | `10.0.40.100` |
+| `forgejo.lab.example.com` | `10.0.40.100` |
 
 These exist purely so LAN clients hit the ingress VIP directly instead of round-tripping through
 the Cloudflare tunnel. Rebuilding onto new infrastructure (new NAS, new Pi-hole instance, etc.)

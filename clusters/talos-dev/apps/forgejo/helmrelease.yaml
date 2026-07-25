@@ -41,8 +41,8 @@ spec:
         existingSecret: forgejo-admin-credentials
       config:
         server:
-          DOMAIN: forgeo.lab.example.com
-          ROOT_URL: https://forgeo.lab.example.com/
+          DOMAIN: forgejo.lab.example.com
+          ROOT_URL: https://forgejo.lab.example.com/
 
     ingress:
       enabled: true
@@ -50,12 +50,12 @@ spec:
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
       hosts:
-        - host: forgeo.lab.example.com
+        - host: forgejo.lab.example.com
           paths:
             - path: /
               pathType: Prefix
               port: http
       tls:
         - hosts:
-            - forgeo.lab.example.com
+            - forgejo.lab.example.com
           secretName: forgejo-tls

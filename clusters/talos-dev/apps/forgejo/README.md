@@ -4,7 +4,7 @@
 [forgejo-helm](https://code.forgejo.org/forgejo-helm/forgejo-helm) chart, managed by Flux like every
 other app in this repo.
 
-- **URL:** https://forgeo.lab.example.com (internal only — see the "DNS records" section of the [root README](../../../../README.md) for the split-DNS entry)
+- **URL:** https://forgejo.lab.example.com (internal only — see the "DNS records" section of the [root README](../../../../README.md) for the split-DNS entry)
 - **Namespace:** `forgejo`
 - **Storage:** 10Gi on Longhorn
 
@@ -47,10 +47,10 @@ Ingress change.
    - Mount a `longhorn` PersistentVolumeClaim (10Gi) for repo data, attachments, and the embedded
      SQLite database — no separate database subchart, same reasoning as n8n.
    - Set `gitea.config.server.DOMAIN`/`ROOT_URL` so Forgejo generates correct external links and
-     clone URLs for `https://forgeo.lab.example.com`.
+     clone URLs for `https://forgejo.lab.example.com`.
    - Create the initial admin user from `forgejo-admin-credentials` via `gitea.admin.existingSecret`,
      instead of plaintext values in this file.
-   - Create an `Ingress` for `forgeo.lab.example.com` via `nginx` + `letsencrypt-production` — no
+   - Create an `Ingress` for `forgejo.lab.example.com` via `nginx` + `letsencrypt-production` — no
      Authentik forward-auth annotations, see [Why no SSO](#why-no-sso) above.
 
 No manual Helm install is required — pushing to `prod` is enough. Flux reconciles every 5 minutes
