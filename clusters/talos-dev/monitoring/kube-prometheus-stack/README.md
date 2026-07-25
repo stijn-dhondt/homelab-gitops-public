@@ -24,36 +24,59 @@ its dashboard too, instead of leaving an orphaned entry in a central `monitoring
 ## The datasource-UID gotcha
 
 Dashboards downloaded from grafana.com or a project's own repo almost always reference their
-datasource as a template variable — `${DS_PROMETHEUS}` or `${datasource}` — meant to be resolved by
-Grafana's *manual import* wizard (which asks "which datasource should this use?"). The sidecar
-loading mechanism used here has no such wizard, so an unresolved template variable shows every
-panel as "Datasource not found" instead of actual data.
+datasource as a template variable — `${DS_PROMETHEUS}`, `${datasource}`, or **a dashboard-specific
+name** like the Longhorn dashboard's `${DS_PROMETHEUS-LONGHORN}` — meant to be resolved by Grafana's
+*manual import* wizard (which asks "which datasource should this use?"). The sidecar loading
+mechanism used here has no such wizard, so an unresolved template variable renders every panel with
+no data at all (not an error, just silently empty) instead of the real numbers.
+
+**Caught this for real:** the Longhorn dashboard shipped exactly like this — every panel silently
+empty despite the underlying `longhorn_*` metrics being live in Prometheus the whole time (verified
+directly against the Prometheus API before suspecting the dashboard itself). The other four
+dashboards added at the same time all happened to use the two common placeholder names; Longhorn's
+didn't, so a substitution script only checking for those two missed it. **Don't assume the
+placeholder name — grep the actual downloaded JSON for `${` before deciding it's clean:**
+```bash
+grep -o '"\${[^}]*}"' dashboard.json | sort -u
+```
 
 Fix: this cluster's Prometheus datasource has a **fixed, non-random UID** — literally the string
 `prometheus` (confirmed via `kubectl get configmap kube-prometheus-stack-grafana-datasource -n monitoring -o yaml`,
-also `isDefault: true`). Every dashboard `ConfigMap` in this repo has had `${DS_PROMETHEUS}` /
-`${datasource}` replaced with the literal string `prometheus` throughout, and any now-unused
-`datasource`-type `templating.list` entries stripped, before being committed — so panels render
-immediately with no manual datasource selection.
+also `isDefault: true`). Every dashboard `ConfigMap` in this repo has had every such placeholder
+replaced with the literal string `prometheus` throughout, and any now-unused `datasource`-type
+`templating.list` entries stripped, before being committed — so panels render immediately with no
+manual datasource selection.
 
 ## Adding a Grafana dashboard
 
 1. Get the dashboard JSON — prefer the project's own repo over a random grafana.com upload if one
    exists (e.g. `kubernetes/ingress-nginx`'s own `deploy/grafana/dashboards/nginx.json`), otherwise
    `curl -sL -o dashboard.json "https://grafana.com/api/dashboards/<id>/revisions/latest/download"`.
-2. Patch the datasource references — a one-off Python snippet is more reliable than `sed` for this
-   (handles both `${DS_PROMETHEUS}` and `${datasource}`, and strips the now-dead template variable):
+2. **First, check what the placeholder is actually called** — don't assume it's one of the two
+   common names:
+   ```bash
+   grep -o '"\${[^}]*}"' dashboard.json | sort -u
+   ```
+   Then patch every name it finds (a one-off Python snippet is more reliable than `sed` for this):
    ```python
-   import json
+   import json, re
    with open("dashboard.json") as f:
        text = f.read()
-   text = text.replace("${DS_PROMETHEUS}", "prometheus").replace("${datasource}", "prometheus")
+   # Replace every ${...} placeholder found above, not just the common ${DS_PROMETHEUS}/${datasource} ones -
+   # confirm with the grep command first, add any others this dashboard uses.
+   text = re.sub(r'\$\{DS_PROMETHEUS[^}]*\}', 'prometheus', text)
+   text = text.replace("${datasource}", "prometheus")
    data = json.loads(text)
    if "templating" in data:
        data["templating"]["list"] = [v for v in data["templating"]["list"] if v.get("type") != "datasource"]
    data.pop("id", None)  # avoid colliding with an existing dashboard's numeric ID
    with open("dashboard.json", "w") as f:
        json.dump(data, f)
+   ```
+   **Verify it actually worked before wrapping it as a ConfigMap** — re-run the grep from step 2;
+   zero output means clean:
+   ```bash
+   grep -o '"\${[^}]*}"' dashboard.json | sort -u   # should print nothing
    ```
 3. Wrap it as a labeled `ConfigMap`, in the owning component's namespace and folder:
    ```bash
