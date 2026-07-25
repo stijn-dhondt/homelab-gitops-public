@@ -9,3 +9,4 @@ resources:
   - ingress.yaml
   - recurringjob-nightly.yaml
   - servicemonitor.yaml
+  - grafana-dashboard-configmap.yaml

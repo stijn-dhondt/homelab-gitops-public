@@ -20,6 +20,7 @@ chart, managed by Flux like every other app in this repo.
 | `wordpress-credentials-sealed.yaml` | A `SealedSecret` holding the WordPress admin password. |
 | `wordpress-mariadb-credentials-sealed.yaml` | A `SealedSecret` holding the MariaDB `root`, application, replication, and metrics-exporter passwords. |
 | `ingress-www-redirect.yaml` | A second, standalone `Ingress` for `www.example.com` that just 301-redirects to `https://example.com`. It's separate from the chart's own ingress because the chart only manages one hostname. |
+| `grafana-dashboard-configmap.yaml` | MariaDB connections/query rate/slow queries ([grafana.com #7362](https://grafana.com/grafana/dashboards/7362-mysql-overview/), Percona's popular `mysqld_exporter`-format dashboard — matches the metrics the chart's bundled exporter already produces). Auto-loaded by Grafana's sidecar, see `monitoring/kube-prometheus-stack/README.md`. |
 | `kustomization.yaml` | Lists all the files above so Flux applies them together. Referenced from `clusters/talos-dev/kustomization.yaml`. |
 
 ## How it fits together

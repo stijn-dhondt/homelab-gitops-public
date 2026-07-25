@@ -17,6 +17,7 @@ reachable from the internet.
 | `helmrepository.yaml` | The `cert-manager` chart from the project's own repo. |
 | `helmrelease.yaml` | 2 replicas + 2 webhook replicas, CRDs installed via the chart, Prometheus ServiceMonitor. |
 | `cloudflare-api-token-sealed.yaml` | A `SealedSecret` holding the Cloudflare API token the DNS-01 solver uses. Needs `Zone → DNS → Edit` scoped to `example.com` — see [Secrets](#secrets) below. |
+| `grafana-dashboard-configmap.yaml` | Certificate expiry/readiness overview across every app ([grafana.com #20842](https://grafana.com/grafana/dashboards/20842-cert-manager-kubernetes/)) — auto-loaded by Grafana's sidecar, see `monitoring/kube-prometheus-stack/README.md`. |
 
 The `ClusterIssuer`s themselves (staging + production) live in the sibling
 `clusters/talos-dev/networking/cert-manager-issuers/` folder, reconciled as a **separate** Flux

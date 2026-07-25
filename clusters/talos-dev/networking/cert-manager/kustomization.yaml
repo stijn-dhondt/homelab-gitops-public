@@ -5,3 +5,4 @@ resources:
   - helmrepository.yaml
   - helmrelease.yaml
   - cloudflare-api-token-sealed.yaml
+  - grafana-dashboard-configmap.yaml

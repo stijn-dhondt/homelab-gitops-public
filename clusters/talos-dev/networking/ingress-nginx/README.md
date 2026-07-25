@@ -10,6 +10,15 @@ The Ingress controller every app in this cluster routes through — `*.lab.examp
 | `namespace.yaml` | Creates the `ingress-nginx` namespace. |
 | `helmrepository.yaml` | The `ingress-nginx` chart from the project's own repo. |
 | `helmrelease.yaml` | 2 replicas, a `LoadBalancer` Service pinned to `10.0.40.100` (the first IP in Cilium's LB IPAM pool — see `networking/cilium/README.md`), Prometheus metrics/ServiceMonitor, and pod anti-affinity so both replicas don't land on the same node. |
+| `grafana-dashboard-configmap.yaml` | The official [kubernetes/ingress-nginx Grafana dashboard](https://github.com/kubernetes/ingress-nginx/blob/main/deploy/grafana/dashboards/nginx.json), request rate/latency/error-rate per ingress. See [Grafana dashboard](#grafana-dashboard) below. |
+
+## Grafana dashboard
+
+`grafana-dashboard-configmap.yaml` is the official
+[kubernetes/ingress-nginx dashboard](https://github.com/kubernetes/ingress-nginx/blob/main/deploy/grafana/dashboards/nginx.json)
+— request rate/latency/error-rate per ingress. Auto-loaded by Grafana's sidecar; see
+`monitoring/kube-prometheus-stack/README.md`'s "Adding a Grafana dashboard" for how this mechanism
+works in general and the exact steps to update this one.
 
 ## Common tasks
 

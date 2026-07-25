@@ -22,6 +22,7 @@ online/non-disruptive — every `apps/*/README.md`'s "grow the storage" section 
 | `ingress.yaml` | Longhorn's own UI, at `longhorn.lab.example.com` — forward-auth annotations, see the authentik README's "How apps get protected". |
 | `authentik-auth-headers-configmap.yaml`, `authentik-outpost-service.yaml` | Forward-auth plumbing shared with every protected app. |
 | `servicemonitor.yaml` | Prometheus scrape config for Longhorn's own metrics. |
+| `grafana-dashboard-configmap.yaml` | Volume health/replica status/disk usage per PV — the dashboard Longhorn's own docs recommend ([grafana.com #17626](https://grafana.com/grafana/dashboards/17626)). Auto-loaded by Grafana's sidecar, see `monitoring/kube-prometheus-stack/README.md`. |
 
 ## The NAS backup share needs manual permissions (not in git)
 

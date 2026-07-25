@@ -27,6 +27,11 @@ configured, not in the one-time bootstrap command.
 | `ingress.yaml` | Hubble UI's own `Ingress` (`hubble.lab.example.com`) — see the authentik README for why it also has forward-auth annotations. |
 | `authentik-auth-headers-configmap.yaml`, `authentik-outpost-service.yaml` | Forward-auth plumbing shared with every protected app — see `apps/authentik/README.md`'s "How apps get protected". |
 | `authentik-bypass-api-ingress.yaml` | A deliberate, documented exception: Hubble UI's own streaming API (`/api/control-stream`, `/api/service-map-stream`) bypasses the auth gate, because its gRPC-Web client doesn't send the session cookie the way normal page loads do. See the authentik README for the full story. |
+| `grafana-dashboard-cilium-agent-configmap.yaml` | Cilium's own data-plane/control-plane dashboard ([grafana.com #21431](https://grafana.com/grafana/dashboards/21431-cilium-metrics/), sourced from the `cilium/cilium` repo's `v1.19` branch to match this cluster's chart version). |
+| `grafana-dashboard-hubble-configmap.yaml` | Hubble flow-observability dashboard (same repo/branch, `hubble-dashboard.json`) — complements the live Hubble UI with historical trends. |
+
+Both auto-loaded by Grafana's sidecar — see `monitoring/kube-prometheus-stack/README.md` for how
+that mechanism works and how to update either.
 
 ## Common tasks
 

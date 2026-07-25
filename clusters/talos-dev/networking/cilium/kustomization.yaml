@@ -9,3 +9,5 @@ resources:
   - authentik-outpost-service.yaml
   - ingress.yaml
   - authentik-bypass-api-ingress.yaml
+  - grafana-dashboard-cilium-agent-configmap.yaml
+  - grafana-dashboard-hubble-configmap.yaml
