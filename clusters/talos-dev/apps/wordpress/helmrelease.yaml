@@ -50,6 +50,12 @@ spec:
           size: 4Gi
       metrics:
         enabled: true
+        # Enables the "Process States" / "Top Process States Hourly" panels on
+        # the MySQL Overview Grafana dashboard (mysql_info_schema_threads is
+        # otherwise never exported).
+        extraArgs:
+          primary:
+            - --collect.info_schema.processlist
         serviceMonitor:
           enabled: true
           selector:

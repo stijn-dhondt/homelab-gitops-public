@@ -324,103 +324,20 @@ data:
     "BPF", "type": "text"}, {"datasource": {"type": "prometheus", "uid": "prometheus"},
     "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow":
     false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement":
-    "auto", "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "bars", "fillOpacity":
-    100, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
-    false}, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize":
-    5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls":
-    false, "stacking": {"group": "A", "mode": "normal"}, "thresholdsStyle": {"mode":
-    "off"}}, "links": [], "mappings": [], "thresholds": {"mode": "absolute", "steps":
-    [{"color": "green", "value": null}, {"color": "red", "value": 80}]}, "unit": "ops"},
-    "overrides": [{"matcher": {"id": "byValue", "options": {"op": "gte", "reducer":
-    "allIsZero", "value": 0}}, "properties": [{"id": "custom.hideFrom", "value": {"legend":
-    true, "tooltip": true, "viz": false}}]}, {"matcher": {"id": "byValue", "options":
-    {"op": "gte", "reducer": "allIsNull", "value": 0}}, "properties": [{"id": "custom.hideFrom",
-    "value": {"legend": true, "tooltip": true, "viz": false}}]}]}, "gridPos": {"h":
-    8, "w": 12, "x": 0, "y": 38}, "id": 146, "options": {"legend": {"calcs": ["mean",
-    "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip":
-    {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource":
-    {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "avg(rate(cilium_bpf_syscall_duration_seconds_count{k8s_app=\"cilium\",
-    pod=~\"$pod\"}[1m])) by (pod, operation)", "format": "time_series", "intervalFactor":
-    1, "legendFormat": "{{operation}}", "range": true, "refId": "A"}], "title": "#
-    system calls (average node)", "type": "timeseries"}, {"datasource": {"type": "prometheus",
-    "uid": "prometheus"}, "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"},
-    "custom": {"axisBorderShow": false, "axisCenteredZero": false, "axisColorMode":
-    "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor":
-    0.6, "drawStyle": "bars", "fillOpacity": 100, "gradientMode": "none", "hideFrom":
-    {"legend": false, "tooltip": false, "viz": false}, "insertNulls": false, "lineInterpolation":
-    "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": {"type": "linear"},
-    "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode":
-    "normal"}, "thresholdsStyle": {"mode": "off"}}, "decimals": 0, "links": [], "mappings":
-    [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null},
-    {"color": "red", "value": 80}]}, "unit": "ops"}, "overrides": [{"matcher": {"id":
-    "byValue", "options": {"op": "gte", "reducer": "allIsZero", "value": 0}}, "properties":
-    [{"id": "custom.hideFrom", "value": {"legend": true, "tooltip": true, "viz": false}}]},
-    {"matcher": {"id": "byValue", "options": {"op": "gte", "reducer": "allIsNull",
-    "value": 0}}, "properties": [{"id": "custom.hideFrom", "value": {"legend": true,
-    "tooltip": true, "viz": false}}]}]}, "gridPos": {"h": 8, "w": 12, "x": 12, "y":
-    38}, "id": 145, "options": {"legend": {"calcs": ["mean", "max"], "displayMode":
-    "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi",
-    "sort": "desc"}}, "pluginVersion": "11.3.1", "targets": [{"datasource": {"type":
-    "prometheus", "uid": "prometheus"}, "expr": "max(rate(cilium_bpf_syscall_duration_seconds_count{k8s_app=\"cilium\",
-    pod=~\"$pod\"}[1m])) by (pod, operation)", "format": "time_series", "intervalFactor":
-    1, "legendFormat": "{{operation}}", "refId": "A"}], "title": "# system calls (max
-    node)", "type": "timeseries"}, {"datasource": {"type": "prometheus", "uid": "prometheus"},
-    "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow":
-    false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement":
     "auto", "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity":
     10, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
     false}, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize":
     5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls":
     false, "stacking": {"group": "A", "mode": "none"}, "thresholdsStyle": {"mode":
     "off"}}, "links": [], "mappings": [], "thresholds": {"mode": "absolute", "steps":
-    [{"color": "green", "value": null}, {"color": "red", "value": 80}]}, "unit": "s"},
+    [{"color": "green", "value": null}, {"color": "red", "value": 80}]}, "unit": "ops"},
     "overrides": [{"matcher": {"id": "byValue", "options": {"op": "gte", "reducer":
     "allIsZero", "value": 0}}, "properties": [{"id": "custom.hideFrom", "value": {"legend":
-    true, "tooltip": true, "viz": false}}]}, {"matcher": {"id": "byValue", "options":
-    {"op": "gte", "reducer": "allIsNull", "value": 0}}, "properties": [{"id": "custom.hideFrom",
-    "value": {"legend": true, "tooltip": true, "viz": false}}]}]}, "gridPos": {"h":
-    6, "w": 12, "x": 0, "y": 46}, "id": 140, "options": {"legend": {"calcs": ["mean",
-    "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip":
-    {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource":
-    {"type": "prometheus", "uid": "prometheus"}, "expr": "avg(rate(cilium_bpf_syscall_duration_seconds_sum{k8s_app=\"cilium\",
-    pod=~\"$pod\"}[1m])/ rate(cilium_bpf_syscall_duration_seconds_count{k8s_app=\"cilium\",
-    pod=~\"$pod\"}[1m])) by (pod, operation)", "format": "time_series", "intervalFactor":
-    1, "legendFormat": "{{operation}}", "refId": "A"}], "title": "system call latency
-    (avg node)", "type": "timeseries"}, {"datasource": {"type": "prometheus", "uid":
-    "prometheus"}, "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"},
-    "custom": {"axisBorderShow": false, "axisCenteredZero": false, "axisColorMode":
-    "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor":
-    0.6, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom":
-    {"legend": false, "tooltip": false, "viz": false}, "insertNulls": false, "lineInterpolation":
-    "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": {"type": "linear"},
-    "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode":
-    "none"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings": [], "thresholds":
-    {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red",
-    "value": 80}]}, "unit": "s"}, "overrides": []}, "gridPos": {"h": 6, "w": 12, "x":
-    12, "y": 46}, "id": 148, "options": {"legend": {"calcs": ["mean", "max"], "displayMode":
-    "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi",
-    "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource": {"type":
-    "prometheus", "uid": "prometheus"}, "expr": "max(rate(cilium_bpf_syscall_duration_seconds_sum{k8s_app=\"cilium\",
-    pod=~\"$pod\"}[1m])/ rate(cilium_bpf_syscall_duration_seconds_count{k8s_app=\"cilium\",
-    pod=~\"$pod\"}[1m])) by (pod, operation)", "format": "time_series", "intervalFactor":
-    1, "legendFormat": "{{operation}}", "refId": "A"}], "title": "system call latency
-    (max node)", "type": "timeseries"}, {"datasource": {"type": "prometheus", "uid":
-    "prometheus"}, "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"},
-    "custom": {"axisBorderShow": false, "axisCenteredZero": false, "axisColorMode":
-    "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor":
-    0.6, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom":
-    {"legend": false, "tooltip": false, "viz": false}, "insertNulls": false, "lineInterpolation":
-    "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": {"type": "linear"},
-    "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode":
-    "none"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings": [], "thresholds":
-    {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red",
-    "value": 80}]}, "unit": "ops"}, "overrides": [{"matcher": {"id": "byValue", "options":
-    {"op": "gte", "reducer": "allIsZero", "value": 0}}, "properties": [{"id": "custom.hideFrom",
-    "value": {"legend": true, "tooltip": true, "viz": false}}]}]}, "gridPos": {"h":
-    6, "w": 8, "x": 0, "y": 52}, "id": 142, "options": {"legend": {"calcs": [], "displayMode":
-    "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi",
-    "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource": {"type":
-    "prometheus", "uid": "prometheus"}, "expr": "topk(5, avg(rate(cilium_bpf_map_ops_total{k8s_app=\"cilium\",
+    true, "tooltip": true, "viz": false}}]}]}, "gridPos": {"h": 6, "w": 8, "x": 0,
+    "y": 52}, "id": 142, "options": {"legend": {"calcs": [], "displayMode": "list",
+    "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort":
+    "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource": {"type": "prometheus",
+    "uid": "prometheus"}, "expr": "topk(5, avg(rate(cilium_bpf_map_ops_total{k8s_app=\"cilium\",
     pod=~\"$pod\"}[5m])) by (pod, map_name, operation))", "format": "time_series",
     "intervalFactor": 1, "legendFormat": "{{map_name}} {{operation}}", "refId": "A"}],
     "title": "map ops (average node)", "type": "timeseries"}, {"datasource": {"type":
@@ -465,220 +382,46 @@ data:
     pod=~\"$pod\"}[5m])) by (pod, map_name, operation)", "format": "time_series",
     "intervalFactor": 1, "legendFormat": "{{map_name}} {{operation}}", "refId": "A"}],
     "title": "map ops (sum failures)", "type": "timeseries"}, {"fieldConfig": {"defaults":
-    {}, "overrides": []}, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 58}, "id": 182,
+    {}, "overrides": []}, "gridPos": {"h": 1, "w": 24, "x": 0, "y": 75}, "id": 47,
     "options": {"code": {"language": "plaintext", "showLineNumbers": false, "showMiniMap":
     false}, "content": "", "mode": "markdown"}, "pluginVersion": "11.3.1", "title":
-    "kvstore", "type": "text"}, {"datasource": {"type": "prometheus", "uid": "prometheus"},
-    "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow":
-    false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement":
-    "auto", "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "bars", "fillOpacity":
-    100, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
-    false}, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize":
-    5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls":
-    false, "stacking": {"group": "A", "mode": "normal"}, "thresholdsStyle": {"mode":
-    "off"}}, "decimals": 0, "links": [], "mappings": [], "thresholds": {"mode": "absolute",
-    "steps": [{"color": "green", "value": null}, {"color": "red", "value": 80}]},
-    "unit": "ops"}, "overrides": [{"matcher": {"id": "byValue", "options": {"op":
-    "gte", "reducer": "allIsZero", "value": 0}}, "properties": [{"id": "custom.hideFrom",
-    "value": {"legend": true, "tooltip": true, "viz": false}}]}, {"matcher": {"id":
-    "byValue", "options": {"op": "gte", "reducer": "allIsNull", "value": 0}}, "properties":
-    [{"id": "custom.hideFrom", "value": {"legend": true, "tooltip": true, "viz": false}}]}]},
-    "gridPos": {"h": 5, "w": 12, "x": 0, "y": 59}, "id": 184, "options": {"legend":
-    {"calcs": ["mean", "max"], "displayMode": "table", "placement": "right", "showLegend":
-    true}, "tooltip": {"mode": "multi", "sort": "desc"}}, "pluginVersion": "11.3.1",
-    "targets": [{"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr":
-    "sum(rate(kvstore_operations_total{pod=~\"$pod\"}[1m])) by (pod, scope, action)",
-    "format": "time_series", "intervalFactor": 1, "legendFormat": "{{scope}} {{action}}",
-    "refId": "A"}], "title": "# operations (sum all nodes)", "type": "timeseries"},
-    {"datasource": {"type": "prometheus", "uid": "prometheus"}, "fieldConfig": {"defaults":
-    {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero":
-    false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment":
-    0, "barWidthFactor": 0.6, "drawStyle": "bars", "fillOpacity": 100, "gradientMode":
-    "none", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "insertNulls":
-    false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution":
-    {"type": "linear"}, "showPoints": "never", "spanNulls": false, "stacking": {"group":
-    "A", "mode": "normal"}, "thresholdsStyle": {"mode": "off"}}, "decimals": 0, "links":
-    [], "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green",
-    "value": null}, {"color": "red", "value": 80}]}, "unit": "ops"}, "overrides":
-    [{"matcher": {"id": "byValue", "options": {"op": "gte", "reducer": "allIsZero",
-    "value": 0}}, "properties": [{"id": "custom.hideFrom", "value": {"legend": true,
-    "tooltip": true, "viz": false}}]}, {"matcher": {"id": "byValue", "options": {"op":
-    "gte", "reducer": "allIsNull", "value": 0}}, "properties": [{"id": "custom.hideFrom",
-    "value": {"legend": true, "tooltip": true, "viz": false}}]}]}, "gridPos": {"h":
-    5, "w": 12, "x": 12, "y": 59}, "id": 186, "options": {"legend": {"calcs": ["mean",
-    "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip":
-    {"mode": "multi", "sort": "desc"}}, "pluginVersion": "11.3.1", "targets": [{"datasource":
-    {"type": "prometheus", "uid": "prometheus"}, "expr": "max(rate(kvstore_operations_total{pod=~\"$pod\"}[1m]))
-    by (pod, scope, action)", "format": "time_series", "intervalFactor": 1, "legendFormat":
-    "{{scope}} {{action}}", "refId": "A"}], "title": "# operations (max node)", "type":
-    "timeseries"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "fieldConfig":
-    {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow":
-    false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement":
-    "auto", "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity":
-    10, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
-    false}, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize":
-    5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls":
-    false, "stacking": {"group": "A", "mode": "none"}, "thresholdsStyle": {"mode":
-    "off"}}, "links": [], "mappings": [], "thresholds": {"mode": "absolute", "steps":
-    [{"color": "green", "value": null}, {"color": "red", "value": 80}]}, "unit": "s"},
-    "overrides": [{"matcher": {"id": "byValue", "options": {"op": "gte", "reducer":
-    "allIsZero", "value": 0}}, "properties": [{"id": "custom.hideFrom", "value": {"legend":
-    true, "tooltip": true, "viz": false}}]}, {"matcher": {"id": "byValue", "options":
-    {"op": "gte", "reducer": "allIsNull", "value": 0}}, "properties": [{"id": "custom.hideFrom",
-    "value": {"legend": true, "tooltip": true, "viz": false}}]}]}, "gridPos": {"h":
-    5, "w": 12, "x": 0, "y": 64}, "id": 188, "options": {"legend": {"calcs": ["mean",
-    "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip":
-    {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource":
-    {"type": "prometheus", "uid": "prometheus"}, "expr": "topk(5, avg(rate(cilium_kvstore_operations_duration_seconds_sum{pod=~\"$pod\"}[1m]))
-    by (pod, action, scope) / avg(rate(cilium_kvstore_operations_duration_seconds_count{pod=~\"$pod\"}[1m]))
-    by (pod, action, scope))", "format": "time_series", "intervalFactor": 1, "legendFormat":
-    "{{action}} {{scope}}", "refId": "A"}], "title": "latency (average node)", "type":
-    "timeseries"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "fieldConfig":
-    {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow":
-    false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement":
-    "auto", "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity":
-    10, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
-    false}, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize":
-    5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls":
-    false, "stacking": {"group": "A", "mode": "none"}, "thresholdsStyle": {"mode":
-    "off"}}, "links": [], "mappings": [], "thresholds": {"mode": "absolute", "steps":
-    [{"color": "green", "value": null}, {"color": "red", "value": 80}]}, "unit": "s"},
-    "overrides": [{"matcher": {"id": "byValue", "options": {"op": "gte", "reducer":
-    "allIsZero", "value": 0}}, "properties": [{"id": "custom.hideFrom", "value": {"legend":
-    true, "tooltip": true, "viz": false}}]}, {"matcher": {"id": "byValue", "options":
-    {"op": "gte", "reducer": "allIsNull", "value": 0}}, "properties": [{"id": "custom.hideFrom",
-    "value": {"legend": true, "tooltip": true, "viz": false}}]}]}, "gridPos": {"h":
-    5, "w": 12, "x": 12, "y": 64}, "id": 190, "options": {"legend": {"calcs": ["mean",
-    "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip":
-    {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource":
-    {"type": "prometheus", "uid": "prometheus"}, "expr": "topk(5, max(rate(cilium_kvstore_operations_duration_seconds_sum{pod=~\"$pod\"}[1m]))
-    by (pod, action, scope) / avg(rate(cilium_kvstore_operations_duration_seconds_count{pod=~\"$pod\"}[1m]))
-    by (pod, action, scope))", "format": "time_series", "intervalFactor": 1, "legendFormat":
-    "{{action}} {{scope}}", "refId": "A"}], "title": "latency (max node)", "type":
-    "timeseries"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "fieldConfig":
-    {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow":
-    false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement":
-    "auto", "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity":
-    10, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
-    false}, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize":
-    5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls":
-    false, "stacking": {"group": "A", "mode": "normal"}, "thresholdsStyle": {"mode":
-    "off"}}, "links": [], "mappings": [], "thresholds": {"mode": "absolute", "steps":
-    [{"color": "green", "value": null}, {"color": "red", "value": 80}]}, "unit": "ops"},
-    "overrides": [{"matcher": {"id": "byValue", "options": {"op": "gte", "reducer":
-    "allIsZero", "value": 0}}, "properties": [{"id": "custom.hideFrom", "value": {"legend":
-    true, "tooltip": true, "viz": false}}]}, {"matcher": {"id": "byValue", "options":
-    {"op": "gte", "reducer": "allIsNull", "value": 0}}, "properties": [{"id": "custom.hideFrom",
-    "value": {"legend": true, "tooltip": true, "viz": false}}]}]}, "gridPos": {"h":
-    6, "w": 12, "x": 0, "y": 69}, "id": 192, "options": {"legend": {"calcs": [], "displayMode":
+    "Cilium network information", "type": "text"}, {"datasource": {"type": "prometheus",
+    "uid": "prometheus"}, "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"},
+    "custom": {"axisBorderShow": false, "axisCenteredZero": false, "axisColorMode":
+    "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor":
+    0.6, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom":
+    {"legend": false, "tooltip": false, "viz": false}, "insertNulls": false, "lineInterpolation":
+    "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": {"type": "linear"},
+    "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode":
+    "none"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings": [], "thresholds":
+    {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red",
+    "value": 80}]}, "unit": "pps"}, "overrides": []}, "gridPos": {"h": 6, "w": 12,
+    "x": 0, "y": 76}, "id": 81, "options": {"legend": {"calcs": [], "displayMode":
     "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi",
     "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource": {"type":
-    "prometheus", "uid": "prometheus"}, "expr": "avg(rate(cilium_kvstore_events_queue_seconds_count{pod=~\"$pod\"}[1m]))
-    by (pod, scope, action)", "format": "time_series", "intervalFactor": 1, "legendFormat":
-    "{{action}} {{scope}}", "refId": "B"}], "title": "Events received (average node)",
-    "type": "timeseries"}, {"fieldConfig": {"defaults": {}, "overrides": []}, "gridPos":
-    {"h": 1, "w": 24, "x": 0, "y": 75}, "id": 47, "options": {"code": {"language":
-    "plaintext", "showLineNumbers": false, "showMiniMap": false}, "content": "", "mode":
-    "markdown"}, "pluginVersion": "11.3.1", "title": "Cilium network information",
-    "type": "text"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "fieldConfig":
-    {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow":
-    false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement":
-    "auto", "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity":
-    10, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
-    false}, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize":
-    5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls":
-    false, "stacking": {"group": "A", "mode": "none"}, "thresholdsStyle": {"mode":
-    "off"}}, "links": [], "mappings": [], "thresholds": {"mode": "absolute", "steps":
-    [{"color": "green", "value": null}, {"color": "red", "value": 80}]}, "unit": "pps"},
-    "overrides": []}, "gridPos": {"h": 6, "w": 12, "x": 0, "y": 76}, "id": 81, "options":
-    {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend":
-    true}, "tooltip": {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1",
-    "targets": [{"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr":
-    "sum(rate(cilium_forward_count_total{k8s_app=\"cilium\", pod=~\"$pod\"}[1m]))
-    by (pod, direction)", "format": "time_series", "intervalFactor": 1, "legendFormat":
-    "{{direction}}", "refId": "A"}], "title": "Forwarded Packets", "type": "timeseries"},
-    {"datasource": {"type": "prometheus", "uid": "prometheus"}, "fieldConfig": {"defaults":
-    {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero":
-    false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment":
-    0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity": 10, "gradientMode":
-    "none", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "insertNulls":
-    false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution":
-    {"type": "linear"}, "showPoints": "never", "spanNulls": false, "stacking": {"group":
-    "A", "mode": "none"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings":
-    [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null},
-    {"color": "red", "value": 80}]}, "unit": "bps"}, "overrides": []}, "gridPos":
-    {"h": 6, "w": 12, "x": 12, "y": 76}, "id": 111, "options": {"legend": {"calcs":
-    [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip":
-    {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource":
-    {"type": "prometheus", "uid": "prometheus"}, "expr": "sum(rate(cilium_forward_bytes_total{k8s_app=\"cilium\",
-    pod=~\"$pod\"}[1m])) by (pod, direction) * 8", "format": "time_series", "intervalFactor":
-    1, "legendFormat": "{{direction}}", "refId": "A"}], "title": "Forwarded Traffic",
+    "prometheus", "uid": "prometheus"}, "expr": "sum(rate(cilium_forward_count_total{k8s_app=\"cilium\",
+    pod=~\"$pod\"}[1m])) by (pod, direction)", "format": "time_series", "intervalFactor":
+    1, "legendFormat": "{{direction}}", "refId": "A"}], "title": "Forwarded Packets",
     "type": "timeseries"}, {"datasource": {"type": "prometheus", "uid": "prometheus"},
     "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow":
     false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement":
     "auto", "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity":
-    35, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
+    10, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
     false}, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize":
     5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls":
     false, "stacking": {"group": "A", "mode": "none"}, "thresholdsStyle": {"mode":
     "off"}}, "links": [], "mappings": [], "thresholds": {"mode": "absolute", "steps":
-    [{"color": "green", "value": null}, {"color": "red", "value": 80}]}, "unit": "short"},
-    "overrides": [{"matcher": {"id": "byName", "options": "Alive  ipv4"}, "properties":
-    [{"id": "color", "value": {"fixedColor": "#0a50a1", "mode": "fixed"}}]}, {"matcher":
-    {"id": "byName", "options": "Alive  ipv4 non-TCP"}, "properties": [{"id": "color",
-    "value": {"fixedColor": "#f9d9f9", "mode": "fixed"}}]}, {"matcher": {"id": "byName",
-    "options": "Alive  ipv6"}, "properties": [{"id": "color", "value": {"fixedColor":
-    "#614d93", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "Alive  ipv6
-    TCP"}, "properties": [{"id": "color", "value": {"fixedColor": "#806eb7", "mode":
-    "fixed"}}]}, {"matcher": {"id": "byName", "options": "Alive  ipv6 non-TCP"}, "properties":
-    [{"id": "color", "value": {"fixedColor": "#614d93", "mode": "fixed"}}]}, {"matcher":
-    {"id": "byName", "options": "Alive CT entries ipv6"}, "properties": [{"id": "color",
-    "value": {"fixedColor": "#badff4", "mode": "fixed"}}]}, {"matcher": {"id": "byName",
-    "options": "Deleted CT entries ipv4"}, "properties": [{"id": "color", "value":
-    {"fixedColor": "#bf1b00", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options":
-    "Deleted ipv4"}, "properties": [{"id": "color", "value": {"fixedColor": "#890f02",
-    "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "Deleted ipv4 non-TCP"},
-    "properties": [{"id": "color", "value": {"fixedColor": "#890f02", "mode": "fixed"}}]},
-    {"matcher": {"id": "byName", "options": "Deleted ipv6"}, "properties": [{"id":
-    "color", "value": {"fixedColor": "#bf1b00", "mode": "fixed"}}]}, {"matcher": {"id":
-    "byName", "options": "L7 denied request"}, "properties": [{"id": "color", "value":
-    {"fixedColor": "#890f02", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options":
-    "L7 forwarded request"}, "properties": [{"id": "color", "value": {"fixedColor":
-    "#7eb26d", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "avg"},
-    "properties": [{"id": "color", "value": {"fixedColor": "#e0f9d7", "mode": "fixed"}}]},
-    {"matcher": {"id": "byName", "options": "deleted"}, "properties": [{"id": "color",
-    "value": {"fixedColor": "#6ed0e0", "mode": "fixed"}}]}, {"matcher": {"id": "byName",
-    "options": "deleted max"}, "properties": [{"id": "color", "value": {"fixedColor":
-    "#447ebc", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "max"},
-    "properties": [{"id": "color", "value": {"fixedColor": "#629e51", "mode": "fixed"}}]},
-    {"matcher": {"id": "byName", "options": "min"}, "properties": [{"id": "color",
-    "value": {"fixedColor": "#629e51", "mode": "fixed"}}]}, {"matcher": {"id": "byName",
-    "options": "max"}, "properties": [{"id": "custom.fillBelowTo", "value": "min"},
-    {"id": "custom.lineWidth", "value": 0}]}, {"matcher": {"id": "byName", "options":
-    "min"}, "properties": [{"id": "custom.lineWidth", "value": 0}]}]}, "gridPos":
-    {"h": 6, "w": 12, "x": 0, "y": 82}, "id": 56, "options": {"legend": {"calcs":
-    [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip":
-    {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource":
-    {"type": "prometheus", "uid": "prometheus"}, "expr": "min(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\",
-    status=\"alive\", family=\"ipv4\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)",
-    "format": "time_series", "interval": "", "intervalFactor": 1, "legendFormat":
-    "min", "refId": "A"}, {"datasource": {"type": "prometheus", "uid": "prometheus"},
-    "expr": "avg(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\", status=\"alive\",
-    family=\"ipv4\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)", "format":
-    "time_series", "intervalFactor": 1, "legendFormat": "avg", "refId": "B"}, {"datasource":
-    {"type": "prometheus", "uid": "prometheus"}, "expr": "max(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\",
-    status=\"alive\", family=\"ipv4\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)",
-    "format": "time_series", "intervalFactor": 1, "legendFormat": "max", "refId":
-    "C"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr": "avg(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\",
-    status=\"deleted\", family=\"ipv4\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)",
-    "format": "time_series", "intervalFactor": 1, "legendFormat": "deleted", "refId":
-    "D"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr": "max(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\",
-    status=\"deleted\", family=\"ipv4\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)",
-    "format": "time_series", "intervalFactor": 1, "legendFormat": "deleted max", "refId":
-    "E"}], "title": "IPv4 Conntrack TCP", "type": "timeseries"}, {"datasource": {"type":
-    "prometheus", "uid": "prometheus"}, "fieldConfig": {"defaults": {"color": {"mode":
-    "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero": false,
-    "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment":
+    [{"color": "green", "value": null}, {"color": "red", "value": 80}]}, "unit": "bps"},
+    "overrides": []}, "gridPos": {"h": 6, "w": 12, "x": 12, "y": 76}, "id": 111, "options":
+    {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend":
+    true}, "tooltip": {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1",
+    "targets": [{"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr":
+    "sum(rate(cilium_forward_bytes_total{k8s_app=\"cilium\", pod=~\"$pod\"}[1m]))
+    by (pod, direction) * 8", "format": "time_series", "intervalFactor": 1, "legendFormat":
+    "{{direction}}", "refId": "A"}], "title": "Forwarded Traffic", "type": "timeseries"},
+    {"datasource": {"type": "prometheus", "uid": "prometheus"}, "fieldConfig": {"defaults":
+    {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero":
+    false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment":
     0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity": 35, "gradientMode":
     "none", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "insertNulls":
     false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution":
@@ -718,27 +461,27 @@ data:
     "#629e51", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "max"},
     "properties": [{"id": "custom.fillBelowTo", "value": "min"}, {"id": "custom.lineWidth",
     "value": 0}]}, {"matcher": {"id": "byName", "options": "min"}, "properties": [{"id":
-    "custom.lineWidth", "value": 0}]}]}, "gridPos": {"h": 6, "w": 12, "x": 12, "y":
-    82}, "id": 128, "options": {"legend": {"calcs": [], "displayMode": "list", "placement":
+    "custom.lineWidth", "value": 0}]}]}, "gridPos": {"h": 6, "w": 12, "x": 0, "y":
+    82}, "id": 56, "options": {"legend": {"calcs": [], "displayMode": "list", "placement":
     "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "none"}},
     "pluginVersion": "11.3.1", "targets": [{"datasource": {"type": "prometheus", "uid":
     "prometheus"}, "expr": "min(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\",
-    status=\"alive\", family=\"ipv6\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)",
+    status=\"alive\", family=\"ipv4\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)",
     "format": "time_series", "interval": "", "intervalFactor": 1, "legendFormat":
     "min", "refId": "A"}, {"datasource": {"type": "prometheus", "uid": "prometheus"},
     "expr": "avg(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\", status=\"alive\",
-    family=\"ipv6\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)", "format":
+    family=\"ipv4\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)", "format":
     "time_series", "intervalFactor": 1, "legendFormat": "avg", "refId": "B"}, {"datasource":
     {"type": "prometheus", "uid": "prometheus"}, "expr": "max(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\",
-    status=\"alive\", family=\"ipv6\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)",
+    status=\"alive\", family=\"ipv4\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)",
     "format": "time_series", "intervalFactor": 1, "legendFormat": "max", "refId":
     "C"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr": "avg(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\",
-    status=\"deleted\", family=\"ipv6\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)",
+    status=\"deleted\", family=\"ipv4\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)",
     "format": "time_series", "intervalFactor": 1, "legendFormat": "deleted", "refId":
     "D"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr": "max(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\",
-    status=\"deleted\", family=\"ipv6\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)",
+    status=\"deleted\", family=\"ipv4\", protocol=\"TCP\", pod=~\"$pod\"}) by (family,status)",
     "format": "time_series", "intervalFactor": 1, "legendFormat": "deleted max", "refId":
-    "E"}], "title": "IPv6 Conntrack TCP", "type": "timeseries"}, {"datasource": {"type":
+    "E"}], "title": "IPv4 Conntrack TCP", "type": "timeseries"}, {"datasource": {"type":
     "prometheus", "uid": "prometheus"}, "fieldConfig": {"defaults": {"color": {"mode":
     "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero": false,
     "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment":
@@ -806,70 +549,6 @@ data:
     "prometheus", "uid": "prometheus"}, "fieldConfig": {"defaults": {"color": {"mode":
     "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero": false,
     "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment":
-    0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity": 35, "gradientMode":
-    "none", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "insertNulls":
-    false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution":
-    {"type": "linear"}, "showPoints": "never", "spanNulls": false, "stacking": {"group":
-    "A", "mode": "none"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings":
-    [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null},
-    {"color": "red", "value": 80}]}, "unit": "short"}, "overrides": [{"matcher": {"id":
-    "byName", "options": "Alive  ipv4"}, "properties": [{"id": "color", "value": {"fixedColor":
-    "#0a50a1", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "Alive  ipv4
-    non-TCP"}, "properties": [{"id": "color", "value": {"fixedColor": "#f9d9f9", "mode":
-    "fixed"}}]}, {"matcher": {"id": "byName", "options": "Alive  ipv6"}, "properties":
-    [{"id": "color", "value": {"fixedColor": "#614d93", "mode": "fixed"}}]}, {"matcher":
-    {"id": "byName", "options": "Alive  ipv6 TCP"}, "properties": [{"id": "color",
-    "value": {"fixedColor": "#806eb7", "mode": "fixed"}}]}, {"matcher": {"id": "byName",
-    "options": "Alive  ipv6 non-TCP"}, "properties": [{"id": "color", "value": {"fixedColor":
-    "#614d93", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "Alive
-    CT entries ipv6"}, "properties": [{"id": "color", "value": {"fixedColor": "#badff4",
-    "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "Deleted CT entries
-    ipv4"}, "properties": [{"id": "color", "value": {"fixedColor": "#bf1b00", "mode":
-    "fixed"}}]}, {"matcher": {"id": "byName", "options": "Deleted ipv4"}, "properties":
-    [{"id": "color", "value": {"fixedColor": "#890f02", "mode": "fixed"}}]}, {"matcher":
-    {"id": "byName", "options": "Deleted ipv4 non-TCP"}, "properties": [{"id": "color",
-    "value": {"fixedColor": "#890f02", "mode": "fixed"}}]}, {"matcher": {"id": "byName",
-    "options": "Deleted ipv6"}, "properties": [{"id": "color", "value": {"fixedColor":
-    "#bf1b00", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "L7 denied
-    request"}, "properties": [{"id": "color", "value": {"fixedColor": "#890f02", "mode":
-    "fixed"}}]}, {"matcher": {"id": "byName", "options": "L7 forwarded request"},
-    "properties": [{"id": "color", "value": {"fixedColor": "#7eb26d", "mode": "fixed"}}]},
-    {"matcher": {"id": "byName", "options": "avg"}, "properties": [{"id": "color",
-    "value": {"fixedColor": "#e0f9d7", "mode": "fixed"}}]}, {"matcher": {"id": "byName",
-    "options": "deleted"}, "properties": [{"id": "color", "value": {"fixedColor":
-    "#6ed0e0", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "deleted
-    max"}, "properties": [{"id": "color", "value": {"fixedColor": "#447ebc", "mode":
-    "fixed"}}]}, {"matcher": {"id": "byName", "options": "max"}, "properties": [{"id":
-    "color", "value": {"fixedColor": "#629e51", "mode": "fixed"}}]}, {"matcher": {"id":
-    "byName", "options": "min"}, "properties": [{"id": "color", "value": {"fixedColor":
-    "#629e51", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "max"},
-    "properties": [{"id": "custom.fillBelowTo", "value": "min"}, {"id": "custom.lineWidth",
-    "value": 0}]}, {"matcher": {"id": "byName", "options": "min"}, "properties": [{"id":
-    "custom.lineWidth", "value": 0}]}]}, "gridPos": {"h": 6, "w": 12, "x": 12, "y":
-    88}, "id": 130, "options": {"legend": {"calcs": [], "displayMode": "list", "placement":
-    "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "none"}},
-    "pluginVersion": "11.3.1", "targets": [{"datasource": {"type": "prometheus", "uid":
-    "prometheus"}, "expr": "min(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\",
-    status=\"alive\", family=\"ipv6\", protocol=\"non-TCP\", pod=~\"$pod\"}) by (family,status)",
-    "format": "time_series", "interval": "", "intervalFactor": 1, "legendFormat":
-    "min", "refId": "A"}, {"datasource": {"type": "prometheus", "uid": "prometheus"},
-    "expr": "avg(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\", status=\"alive\",
-    family=\"ipv6\", protocol=\"non-TCP\", pod=~\"$pod\"}) by (family,status)", "format":
-    "time_series", "intervalFactor": 1, "legendFormat": "avg", "refId": "B"}, {"datasource":
-    {"type": "prometheus", "uid": "prometheus"}, "expr": "max(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\",
-    status=\"alive\", family=\"ipv6\", protocol=\"non-TCP\", pod=~\"$pod\"}) by (family,status)",
-    "format": "time_series", "intervalFactor": 1, "legendFormat": "max", "refId":
-    "C"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr": "avg(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\",
-    status=\"deleted\", family=\"ipv6\", protocol=\"non-TCP\", pod=~\"$pod\"}) by
-    (family,status)", "format": "time_series", "intervalFactor": 1, "legendFormat":
-    "deleted", "refId": "D"}, {"datasource": {"type": "prometheus", "uid": "prometheus"},
-    "expr": "max(cilium_datapath_conntrack_gc_entries{k8s_app=\"cilium\", status=\"deleted\",
-    family=\"ipv6\", protocol=\"non-TCP\", pod=~\"$pod\"}) by (family,status)", "format":
-    "time_series", "intervalFactor": 1, "legendFormat": "deleted max", "refId": "E"}],
-    "title": "IPv6 Conntrack Non-TCP", "type": "timeseries"}, {"datasource": {"type":
-    "prometheus", "uid": "prometheus"}, "fieldConfig": {"defaults": {"color": {"mode":
-    "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero": false,
-    "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment":
     0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity": 0, "gradientMode":
     "none", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "insertNulls":
     false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution":
@@ -917,30 +596,14 @@ data:
     "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode":
     "none"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings": [], "thresholds":
     {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red",
-    "value": 80}]}, "unit": "ops"}, "overrides": []}, "gridPos": {"h": 5, "w": 12,
-    "x": 0, "y": 99}, "id": 106, "options": {"legend": {"calcs": [], "displayMode":
+    "value": 80}]}, "unit": "short"}, "overrides": []}, "gridPos": {"h": 5, "w": 12,
+    "x": 12, "y": 99}, "id": 89, "options": {"legend": {"calcs": [], "displayMode":
     "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi",
     "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource": {"type":
-    "prometheus", "uid": "prometheus"}, "expr": "avg(rate(cilium_services_events_total{k8s_app=\"cilium\",
-    pod=~\"$pod\"}[1m])) by (pod, action)", "format": "time_series", "intervalFactor":
-    1, "legendFormat": "{{action}}", "refId": "A"}], "title": "Service Updates", "type":
-    "timeseries"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "fieldConfig":
-    {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow":
-    false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement":
-    "auto", "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity":
-    10, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
-    false}, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize":
-    5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls":
-    false, "stacking": {"group": "A", "mode": "none"}, "thresholdsStyle": {"mode":
-    "off"}}, "links": [], "mappings": [], "thresholds": {"mode": "absolute", "steps":
-    [{"color": "green", "value": null}, {"color": "red", "value": 80}]}, "unit": "short"},
-    "overrides": []}, "gridPos": {"h": 5, "w": 12, "x": 12, "y": 99}, "id": 89, "options":
-    {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend":
-    true}, "tooltip": {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1",
-    "targets": [{"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr":
-    "sum(cilium_unreachable_nodes{k8s_app=\"cilium\", pod=~\"$pod\"}) by (pod)", "format":
-    "time_series", "intervalFactor": 1, "legendFormat": "unreachable nodes", "refId":
-    "A"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr": "sum(cilium_unreachable_health_endpoints{k8s_app=\"cilium\",
+    "prometheus", "uid": "prometheus"}, "expr": "sum(cilium_unreachable_nodes{k8s_app=\"cilium\",
+    pod=~\"$pod\"}) by (pod)", "format": "time_series", "intervalFactor": 1, "legendFormat":
+    "unreachable nodes", "refId": "A"}, {"datasource": {"type": "prometheus", "uid":
+    "prometheus"}, "expr": "sum(cilium_unreachable_health_endpoints{k8s_app=\"cilium\",
     pod=~\"$pod\"}) by (pod)", "format": "time_series", "intervalFactor": 1, "legendFormat":
     "unreachable health endpoints", "refId": "B"}], "title": "Connectivity Health",
     "type": "timeseries"}, {"datasource": {"type": "prometheus", "uid": "prometheus"},
@@ -1059,84 +722,64 @@ data:
     proxy_type) (rate(cilium_policy_l7_total{k8s_app=\"cilium\", pod=~\"$pod\"}[1m]))",
     "format": "time_series", "intervalFactor": 1, "legendFormat": "{{proxy_type}}
     - {{rule}}", "range": true, "refId": "A"}], "title": "L7 forwarded request", "type":
-    "timeseries"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "description":
-    "99th percentile of DNS proxy request processing latency, by span", "fieldConfig":
+    "timeseries"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "fieldConfig":
     {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow":
     false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement":
     "auto", "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity":
-    34, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
-    false}, "insertNulls": false, "lineInterpolation": "linear", "lineStyle": {"fill":
-    "solid"}, "lineWidth": 1, "pointSize": 5, "scaleDistribution": {"type": "linear"},
-    "showPoints": "auto", "spanNulls": false, "stacking": {"group": "A", "mode": "none"},
-    "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings": [], "thresholds":
-    {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "s"},
-    "overrides": []}, "gridPos": {"h": 5, "w": 12, "x": 12, "y": 115}, "id": 123,
-    "options": {"legend": {"calcs": ["mean"], "displayMode": "list", "placement":
+    10, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
+    false}, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize":
+    5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls":
+    false, "stacking": {"group": "A", "mode": "none"}, "thresholdsStyle": {"mode":
+    "off"}}, "links": [], "mappings": [], "thresholds": {"mode": "absolute", "steps":
+    [{"color": "green", "value": null}]}, "unit": "pps"}, "overrides": []}, "gridPos":
+    {"h": 5, "w": 12, "x": 0, "y": 120}, "id": 114, "options": {"legend": {"calcs":
+    [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip":
+    {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource":
+    {"type": "prometheus", "uid": "prometheus"}, "expr": "sum(rate(cilium_drop_count_total{k8s_app=\"cilium\",
+    pod=~\"$pod\", reason=\"Policy denied\"}[1m])) by (direction)", "format": "time_series",
+    "intervalFactor": 1, "legendFormat": "{{direction}}", "range": true, "refId":
+    "A"}], "title": "Policy Denies: L3/L4", "type": "timeseries"}, {"datasource":
+    {"type": "prometheus", "uid": "prometheus"}, "fieldConfig": {"defaults": {"color":
+    {"mode": "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero":
+    false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment":
+    0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity": 10, "gradientMode":
+    "none", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "insertNulls":
+    false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution":
+    {"type": "linear"}, "showPoints": "never", "spanNulls": false, "stacking": {"group":
+    "A", "mode": "none"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings":
+    [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]},
+    "unit": "ops"}, "overrides": []}, "gridPos": {"h": 5, "w": 12, "x": 12, "y": 120},
+    "id": 37, "options": {"legend": {"calcs": [], "displayMode": "list", "placement":
     "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "none"}},
     "pluginVersion": "11.3.1", "targets": [{"datasource": {"type": "prometheus", "uid":
-    "prometheus"}, "editorMode": "code", "expr": "histogram_quantile(0.99, sum by(scope,
-    le) (rate(cilium_proxy_upstream_reply_seconds_bucket{protocol_l7=\"dns\", k8s_app=\"cilium\",
-    pod=~\"$pod\", scope!=\"totalTime\"}[5m]))) \n", "format": "time_series", "intervalFactor":
-    1, "legendFormat": "{{scope}}", "range": true, "refId": "B"}], "title": "DNS proxy
-    request latency", "type": "timeseries"}, {"datasource": {"type": "prometheus",
-    "uid": "prometheus"}, "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"},
-    "custom": {"axisBorderShow": false, "axisCenteredZero": false, "axisColorMode":
-    "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor":
-    0.6, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom":
-    {"legend": false, "tooltip": false, "viz": false}, "insertNulls": false, "lineInterpolation":
-    "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": {"type": "linear"},
-    "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode":
-    "none"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings": [], "thresholds":
-    {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "pps"},
-    "overrides": []}, "gridPos": {"h": 5, "w": 12, "x": 0, "y": 120}, "id": 114, "options":
-    {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend":
-    true}, "tooltip": {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1",
-    "targets": [{"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr":
-    "sum(rate(cilium_drop_count_total{k8s_app=\"cilium\", pod=~\"$pod\", reason=\"Policy
-    denied\"}[1m])) by (direction)", "format": "time_series", "intervalFactor": 1,
-    "legendFormat": "{{direction}}", "range": true, "refId": "A"}], "title": "Policy
-    Denies: L3/L4", "type": "timeseries"}, {"datasource": {"type": "prometheus", "uid":
-    "prometheus"}, "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"},
-    "custom": {"axisBorderShow": false, "axisCenteredZero": false, "axisColorMode":
-    "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor":
-    0.6, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom":
-    {"legend": false, "tooltip": false, "viz": false}, "insertNulls": false, "lineInterpolation":
-    "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": {"type": "linear"},
-    "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode":
-    "none"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings": [], "thresholds":
-    {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "ops"},
-    "overrides": []}, "gridPos": {"h": 5, "w": 12, "x": 12, "y": 120}, "id": 37, "options":
-    {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend":
-    true}, "tooltip": {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1",
-    "targets": [{"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr":
-    "sum(rate(cilium_policy_l7_total{rule=\"denied\", k8s_app=\"cilium\", pod=~\"$pod\"}[1m]))
-    by (proxy_type)", "format": "time_series", "intervalFactor": 1, "legendFormat":
-    "{{reason}}", "range": true, "refId": "A"}], "title": "Policy Denies: L7", "type":
-    "timeseries"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "description":
-    "End-to-end duration to apply incremental identity updates to the policy control
-    and data planes.", "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"},
-    "custom": {"axisBorderShow": false, "axisCenteredZero": false, "axisColorMode":
-    "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor":
-    0.6, "drawStyle": "line", "fillOpacity": 35, "gradientMode": "none", "hideFrom":
-    {"legend": false, "tooltip": false, "viz": false}, "insertNulls": false, "lineInterpolation":
-    "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": {"type": "linear"},
-    "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode":
-    "none"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings": [], "thresholds":
-    {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red",
-    "value": 80}]}, "unit": "s"}, "overrides": [{"matcher": {"id": "byName", "options":
-    "avg"}, "properties": [{"id": "color", "value": {"fixedColor": "#64b0c8", "mode":
-    "fixed"}}]}, {"matcher": {"id": "byName", "options": "count"}, "properties": [{"id":
-    "color", "value": {"fixedColor": "#9ac48a", "mode": "fixed"}}]}, {"matcher": {"id":
-    "byName", "options": "max"}, "properties": [{"id": "color", "value": {"fixedColor":
-    "#5195ce", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "min"},
-    "properties": [{"id": "color", "value": {"fixedColor": "#6ed0e0", "mode": "fixed"}}]},
-    {"matcher": {"id": "byName", "options": "max"}, "properties": [{"id": "custom.fillBelowTo",
-    "value": "min"}, {"id": "custom.lineWidth", "value": 0}]}, {"matcher": {"id":
-    "byName", "options": "min"}, "properties": [{"id": "custom.lineWidth", "value":
-    0}]}, {"matcher": {"id": "byName", "options": "avg count"}, "properties": [{"id":
-    "unit", "value": "opm"}]}, {"matcher": {"id": "byName", "options": "max count"},
-    "properties": [{"id": "unit", "value": "opm"}]}]}, "gridPos": {"h": 5, "w": 12,
-    "x": 0, "y": 125}, "id": 104, "options": {"legend": {"calcs": [], "displayMode":
+    "prometheus"}, "expr": "sum(rate(cilium_policy_l7_total{rule=\"denied\", k8s_app=\"cilium\",
+    pod=~\"$pod\"}[1m])) by (proxy_type)", "format": "time_series", "intervalFactor":
+    1, "legendFormat": "{{reason}}", "range": true, "refId": "A"}], "title": "Policy
+    Denies: L7", "type": "timeseries"}, {"datasource": {"type": "prometheus", "uid":
+    "prometheus"}, "description": "End-to-end duration to apply incremental identity
+    updates to the policy control and data planes.", "fieldConfig": {"defaults": {"color":
+    {"mode": "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero":
+    false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment":
+    0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity": 35, "gradientMode":
+    "none", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "insertNulls":
+    false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution":
+    {"type": "linear"}, "showPoints": "never", "spanNulls": false, "stacking": {"group":
+    "A", "mode": "none"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings":
+    [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null},
+    {"color": "red", "value": 80}]}, "unit": "s"}, "overrides": [{"matcher": {"id":
+    "byName", "options": "avg"}, "properties": [{"id": "color", "value": {"fixedColor":
+    "#64b0c8", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "count"},
+    "properties": [{"id": "color", "value": {"fixedColor": "#9ac48a", "mode": "fixed"}}]},
+    {"matcher": {"id": "byName", "options": "max"}, "properties": [{"id": "color",
+    "value": {"fixedColor": "#5195ce", "mode": "fixed"}}]}, {"matcher": {"id": "byName",
+    "options": "min"}, "properties": [{"id": "color", "value": {"fixedColor": "#6ed0e0",
+    "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "max"}, "properties":
+    [{"id": "custom.fillBelowTo", "value": "min"}, {"id": "custom.lineWidth", "value":
+    0}]}, {"matcher": {"id": "byName", "options": "min"}, "properties": [{"id": "custom.lineWidth",
+    "value": 0}]}, {"matcher": {"id": "byName", "options": "avg count"}, "properties":
+    [{"id": "unit", "value": "opm"}]}, {"matcher": {"id": "byName", "options": "max
+    count"}, "properties": [{"id": "unit", "value": "opm"}]}]}, "gridPos": {"h": 5,
+    "w": 12, "x": 0, "y": 125}, "id": 104, "options": {"legend": {"calcs": [], "displayMode":
     "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi",
     "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource": {"type":
     "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "histogram_quantile(0.99,
@@ -1208,59 +851,30 @@ data:
     pod=~\"$pod\"}) by (enforcement)", "format": "time_series", "hide": false, "instant":
     true, "interval": "1s", "intervalFactor": 1, "legendFormat": "{{enforcement}}",
     "refId": "B"}], "title": "Endpoints policy enforcement status", "type": "timeseries"},
-    {"datasource": {"type": "prometheus", "uid": "prometheus"}, "fieldConfig": {"defaults":
-    {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero":
-    false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment":
-    0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity": 35, "gradientMode":
-    "none", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "insertNulls":
-    false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution":
-    {"type": "linear"}, "showPoints": "never", "spanNulls": false, "stacking": {"group":
-    "A", "mode": "none"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings":
-    [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null},
-    {"color": "red", "value": 80}]}, "unit": "short"}, "overrides": [{"matcher": {"id":
-    "byName", "options": "avg"}, "properties": [{"id": "color", "value": {"fixedColor":
-    "#b7dbab", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "max"},
-    "properties": [{"id": "color", "value": {"fixedColor": "rgba(89, 132, 76, 0.54)",
-    "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "min"}, "properties":
-    [{"id": "color", "value": {"fixedColor": "#2f575e", "mode": "fixed"}}]}, {"matcher":
-    {"id": "byName", "options": "max"}, "properties": [{"id": "custom.fillBelowTo",
+    {"datasource": {"type": "prometheus", "uid": "prometheus"}, "description": "Endpoint
+    policy calculation time by stage. Shows the 99th-percentile.", "fieldConfig":
+    {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow":
+    false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement":
+    "auto", "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity":
+    35, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz":
+    false}, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize":
+    5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls":
+    false, "stacking": {"group": "A", "mode": "normal"}, "thresholdsStyle": {"mode":
+    "off"}}, "links": [], "mappings": [], "thresholds": {"mode": "absolute", "steps":
+    [{"color": "green", "value": null}, {"color": "red", "value": 80}]}, "unit": "s"},
+    "overrides": [{"matcher": {"id": "byName", "options": "avg"}, "properties": [{"id":
+    "color", "value": {"fixedColor": "#f9d9f9", "mode": "fixed"}}]}, {"matcher": {"id":
+    "byName", "options": "max"}, "properties": [{"id": "color", "value": {"fixedColor":
+    "#806eb7", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "min"},
+    "properties": [{"id": "color", "value": {"fixedColor": "#806eb7", "mode": "fixed"}}]},
+    {"matcher": {"id": "byName", "options": "max"}, "properties": [{"id": "custom.fillBelowTo",
     "value": "min"}, {"id": "custom.lineWidth", "value": 0}]}, {"matcher": {"id":
     "byName", "options": "min"}, "properties": [{"id": "custom.lineWidth", "value":
-    0}]}]}, "gridPos": {"h": 5, "w": 6, "x": 6, "y": 130}, "id": 100, "options": {"legend":
-    {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true},
-    "tooltip": {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1", "targets":
-    [{"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr": "min(cilium_proxy_redirects{k8s_app=\"cilium\",
-    pod=~\"$pod\"}) by (pod)", "format": "time_series", "intervalFactor": 1, "legendFormat":
-    "min", "refId": "A"}, {"datasource": {"type": "prometheus", "uid": "prometheus"},
-    "expr": "avg(cilium_proxy_redirects{k8s_app=\"cilium\", pod=~\"$pod\"}) by (pod)",
-    "format": "time_series", "intervalFactor": 1, "legendFormat": "avg", "refId":
-    "B"}, {"datasource": {"type": "prometheus", "uid": "prometheus"}, "expr": "max(cilium_proxy_redirects{k8s_app=\"cilium\",
-    pod=~\"$pod\"}) by (pod)", "format": "time_series", "intervalFactor": 1, "legendFormat":
-    "max", "refId": "C"}], "title": "Proxy Redirects", "type": "timeseries"}, {"datasource":
-    {"type": "prometheus", "uid": "prometheus"}, "description": "Endpoint policy calculation
-    time by stage. Shows the 99th-percentile.", "fieldConfig": {"defaults": {"color":
-    {"mode": "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero":
-    false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment":
-    0, "barWidthFactor": 0.6, "drawStyle": "line", "fillOpacity": 35, "gradientMode":
-    "none", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "insertNulls":
-    false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution":
-    {"type": "linear"}, "showPoints": "never", "spanNulls": false, "stacking": {"group":
-    "A", "mode": "normal"}, "thresholdsStyle": {"mode": "off"}}, "links": [], "mappings":
-    [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null},
-    {"color": "red", "value": 80}]}, "unit": "s"}, "overrides": [{"matcher": {"id":
-    "byName", "options": "avg"}, "properties": [{"id": "color", "value": {"fixedColor":
-    "#f9d9f9", "mode": "fixed"}}]}, {"matcher": {"id": "byName", "options": "max"},
-    "properties": [{"id": "color", "value": {"fixedColor": "#806eb7", "mode": "fixed"}}]},
-    {"matcher": {"id": "byName", "options": "min"}, "properties": [{"id": "color",
-    "value": {"fixedColor": "#806eb7", "mode": "fixed"}}]}, {"matcher": {"id": "byName",
-    "options": "max"}, "properties": [{"id": "custom.fillBelowTo", "value": "min"},
-    {"id": "custom.lineWidth", "value": 0}]}, {"matcher": {"id": "byName", "options":
-    "min"}, "properties": [{"id": "custom.lineWidth", "value": 0}]}]}, "gridPos":
-    {"h": 5, "w": 12, "x": 12, "y": 130}, "id": 117, "options": {"legend": {"calcs":
-    [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip":
-    {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1", "targets": [{"datasource":
-    {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "histogram_quantile(0.99,
-    sum by(scope, le) (rate(cilium_endpoint_regeneration_time_stats_seconds_bucket{scope=~\"proxyConfiguration|endpointPolicyCalculation|selectorPolicyCalculation|proxyPolicyCalculation\",k8s_app=\"cilium\",status=\"success\",pod=~\"$pod\"}[5m])))",
+    0}]}]}, "gridPos": {"h": 5, "w": 12, "x": 12, "y": 130}, "id": 117, "options":
+    {"legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend":
+    true}, "tooltip": {"mode": "multi", "sort": "none"}}, "pluginVersion": "11.3.1",
+    "targets": [{"datasource": {"type": "prometheus", "uid": "prometheus"}, "editorMode":
+    "code", "expr": "histogram_quantile(0.99, sum by(scope, le) (rate(cilium_endpoint_regeneration_time_stats_seconds_bucket{scope=~\"proxyConfiguration|endpointPolicyCalculation|selectorPolicyCalculation|proxyPolicyCalculation\",k8s_app=\"cilium\",status=\"success\",pod=~\"$pod\"}[5m])))",
     "format": "time_series", "intervalFactor": 1, "legendFormat": "__auto", "range":
     true, "refId": "A"}], "title": "Policy Calculation Time", "type": "timeseries"},
     {"datasource": {"type": "prometheus", "uid": "prometheus"}, "fieldConfig": {"defaults":
@@ -1762,7 +1376,7 @@ data:
     "vtuWtdumz", "version": 1, "weekStart": ""}'
 kind: ConfigMap
 metadata:
-  name: grafana-dashboard-cilium-agent
   labels:
-    grafana_dashboard: "1"
+    grafana_dashboard: '1'
+  name: grafana-dashboard-cilium-agent
   namespace: kube-system

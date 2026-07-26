@@ -192,3 +192,12 @@ spec:
     # Cilium fully replaces kube-proxy (kubeProxyReplacement: true) in this cluster.
     kubeProxy:
       enabled: false
+
+    # No AIX or macOS hosts in this cluster - these default dashboards render
+    # entirely empty (AIX) or match zero instances (macOS), so skip generating them.
+    nodeExporter:
+      operatingSystems:
+        aix:
+          enabled: false
+        darwin:
+          enabled: false
