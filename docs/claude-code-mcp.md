@@ -13,6 +13,14 @@ operational knowledge that isn't reproducible from `kubectl`/`flux` alone.
 | **Cloudflare** | Zero Trust Gateway policies, DNS records, Tunnel config — previously needed slow copy-paste JSON round-trips | OAuth |
 | **GitHub** | Repo/PR/Issues/Actions-run inspection — became necessary once the repo went private (unauthenticated API calls stopped working) | Fine-grained PAT |
 | **UniFi** | Firewall rules, VLANs, clients — previously needed manual dashboard clicks | API key |
+| **Postgres** | Query Authentik's database directly (users, groups, sessions) | Dedicated `mcp_readonly` DB user |
+| **MariaDB** | Query WordPress's database directly (posts, users, options) | Dedicated `mcp_readonly` DB user |
+| **n8n** | List/manage/trigger workflows via `czlonkowski/n8n-mcp` | API key |
+
+**Considered and dropped:** Authentik (no actively-maintained MCP server exists — the 3 community
+attempts found are either >1 year stale or have zero real adoption) and OpenMediaVault/the NAS (same
+conclusion, and OMV's own internal API has no version-stability guarantee across releases — it broke
+going from OMV 7 to 8). Revisit if either matures; not worth wiring up something unreliable now.
 
 ## Prerequisite: the standalone CLI, not just the VS Code extension
 
@@ -26,7 +34,7 @@ brew install --cask claude-code
 ```
 
 Open a **new** terminal afterward and confirm with `claude --version`. Also needed: `brew install uv`
-(both Grafana's and UniFi's MCP servers install via `uv`).
+(Grafana's and UniFi's MCP servers install via `uv`; Postgres's does too).
 
 ## Setup commands
 
@@ -53,9 +61,39 @@ uv tool install unifi-mcp-server
 claude mcp add --env UNIFI_API_KEY=<key> \
   --env UNIFI_API_TYPE=local --env UNIFI_LOCAL_HOST=10.0.20.1 \
   --scope user unifi -- unifi-mcp-server
+
+# Postgres - dedicated mcp_readonly user, read-only (--access-mode=restricted), via the
+# postgres-mcp-loadbalancer.yaml Service (apps/authentik/)
+claude mcp add postgres -e DATABASE_URI="postgresql://mcp_readonly:<pw>@10.0.40.101:5432/authentik?sslmode=disable" \
+  --scope user -- uvx postgres-mcp --access-mode=restricted
+
+# MariaDB - dedicated mcp_readonly user, read-only by default (no ALLOW_*_OPERATION flags set),
+# via the mariadb-mcp-loadbalancer.yaml Service (apps/wordpress/)
+claude mcp add mariadb -e MYSQL_HOST="10.0.40.102" -e MYSQL_PORT="3306" \
+  -e MYSQL_USER="mcp_readonly" -e MYSQL_PASS="<pw>" -e MYSQL_DB="bitnami_wordpress" \
+  --scope user -- npx @benborla29/mcp-server-mysql
+
+# n8n - API key from n8n's own UI: Settings -> n8n API -> Create an API key
+claude mcp add n8n-mcp -e MCP_MODE=stdio -e LOG_LEVEL=error -e DISABLE_CONSOLE_OUTPUT=true \
+  -e N8N_API_URL=https://n8n.lab.example.com -e N8N_API_KEY=<key> \
+  --scope user -- npx n8n-mcp
 ```
 
 Verify: `claude mcp list`.
+
+## Migrating batch-1 servers from `local` to `user` scope
+
+Grafana/Cloudflare/GitHub/UniFi were originally set up with `--scope local` before the scope gotcha
+(below) was understood. To bring them in line with everything added since:
+```bash
+claude mcp remove grafana -s local
+claude mcp remove cloudflare -s local
+claude mcp remove github -s local
+claude mcp remove unifi -s local
+```
+Then re-run each of their four `add` commands above — Cloudflare and GitHub will need their
+OAuth/PAT redone since removing a server drops its stored credential, Grafana and UniFi will just
+work again immediately with the same env vars.
 
 ## Gotchas hit live, in the order we hit them
 
@@ -132,6 +170,26 @@ Note the trailing slash on the URL. An earlier attempt used the `claude mcp add-
 inline JSON blob — works too, but this is what Anthropic's own docs show, and matches what was
 actually used successfully here.
 
+### Postgres/MariaDB are raw TCP, not HTTP — the bypass-ingress trick doesn't apply
+
+Grafana and n8n's Authentik problem was fixable with a second Ingress because both speak HTTP —
+nginx can inspect the path and route `/api` around the forward-auth gate. Postgres and MariaDB speak
+their own binary wire protocols over raw TCP; an `Ingress` object can't proxy that at all. Fix used
+instead: a dedicated `LoadBalancer` Service per database (`postgres-mcp-loadbalancer.yaml` in
+`apps/authentik/`, `mariadb-mcp-loadbalancer.yaml` in `apps/wordpress/`), each with its own IP from
+the same Cilium LB IPAM pool ingress-nginx already uses (`10.0.40.101`/`.102`, one IP per
+Service — confirmed the existing WARP route for the whole `10.0.40.0/24` subnet already covers
+new IPs in that pool with zero additional VPN/firewall config).
+
+This does mean each database's real network port is now reachable to anyone who can reach that
+subnet (LAN or WARP-connected), with **no Authentik/network-level gate in front of it at all** —
+database auth is the only thing protecting it. Mitigated by never using the app's own admin/root
+credentials for this: both got a brand new `mcp_readonly` user, `GRANT`ed `SELECT`-only, created via
+`kubectl exec` directly against each pod (not stored as a `SealedSecret` — these credentials are
+consumed by an external MCP client on this machine, not by anything in-cluster, so there's nothing
+in git that needs them). Confirmed live before trusting it: reads succeed, a `DELETE` against either
+is rejected with a permission error.
+
 ## Health-check script
 
 `~/.claude/scripts/check-mcp-services.sh` — not in this repo (it's a personal-machine utility, and
@@ -155,7 +213,8 @@ claude mcp get <server-name>   # more detail on a specific one, including the ex
 
 **Actually test a connection works**, not just that it shows connected — from a fresh session, ask
 something concrete: "list open PRs on homelab-gitops", "what dashboards exist in Grafana", "show
-Cloudflare DNS records for example.com", "list UniFi clients".
+Cloudflare DNS records for example.com", "list UniFi clients", "how many users are in Authentik's
+Postgres database", "what's the most recent post in WordPress", "list active n8n workflows".
 
 **Reconnect an OAuth-based server** (Cloudflare) after it shows "Needs authentication":
 ```bash
