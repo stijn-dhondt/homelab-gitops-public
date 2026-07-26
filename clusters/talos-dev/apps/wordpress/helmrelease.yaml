@@ -52,3 +52,5 @@ spec:
         enabled: true
         serviceMonitor:
           enabled: true
+          selector:
+            app.kubernetes.io/component: primary

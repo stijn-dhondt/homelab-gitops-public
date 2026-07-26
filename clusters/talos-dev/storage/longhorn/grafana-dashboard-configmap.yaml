@@ -96,7 +96,7 @@ data:
     "values": false}, "lines": true, "linewidth": 1, "nullPointMode": "null", "percentage":
     false, "pluginVersion": "7.1.5", "pointradius": 2, "points": false, "renderer":
     "flot", "seriesOverrides": [], "spaceLength": 10, "stack": false, "steppedLine":
-    false, "targets": [{"expr": "count by (node) (longhorn_volume_state==2)", "interval":
+    false, "targets": [{"expr": "count by (node) (longhorn_volume_state{state=\"attached\"}==1)", "interval":
     "", "legendFormat": "{{node}}", "refId": "A"}], "thresholds": [], "timeFrom":
     null, "timeRegions": [], "timeShift": null, "title": "Number of Volumes Per Node",
     "tooltip": {"shared": true, "sort": 0, "value_type": "individual"}, "type": "graph",
@@ -224,7 +224,7 @@ data:
     {"h": 6, "w": 4, "x": 0, "y": 51}, "id": 34, "options": {"colorMode": "value",
     "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions":
     {"calcs": ["last"], "fields": "", "values": false}, "textMode": "auto"}, "pluginVersion":
-    "7.1.5", "targets": [{"expr": "count(longhorn_volume_state==2) OR on() vector(0)",
+    "7.1.5", "targets": [{"expr": "count(longhorn_volume_state{state=\"attached\"}==1) OR on() vector(0)",
     "interval": "", "legendFormat": "", "refId": "A"}], "timeFrom": null, "timeShift":
     null, "title": "Number Of Attached Volumes", "type": "stat"}, {"datasource": "prometheus",
     "description": "Detached volumes are volumes that aren''t currently attaching
@@ -234,7 +234,7 @@ data:
     "id": 14, "options": {"colorMode": "value", "graphMode": "area", "justifyMode":
     "auto", "orientation": "auto", "reduceOptions": {"calcs": ["last"], "fields":
     "", "values": false}, "textMode": "auto"}, "pluginVersion": "7.1.5", "targets":
-    [{"expr": "count(longhorn_volume_state==3) OR on() vector(0)", "interval": "",
+    [{"expr": "count(longhorn_volume_state{state=\"detached\"}==1) OR on() vector(0)", "interval": "",
     "legendFormat": "", "refId": "A"}], "timeFrom": null, "timeShift": null, "title":
     "Number Of Detached Volumes", "type": "stat"}, {"datasource": null, "fieldConfig":
     {"defaults": {"custom": {}}, "overrides": []}, "gridPos": {"h": 2, "w": 23, "x":
