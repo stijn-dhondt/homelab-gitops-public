@@ -5,4 +5,4 @@ resources:
   - authentik-auth-headers-configmap.yaml
   - authentik-outpost-service.yaml
   - helmrelease.yaml
-  - grafana-api-bypass-ingress.yaml
+  - grafana-mcp-ingress.yaml

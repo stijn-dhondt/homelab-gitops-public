@@ -1,0 +1,54 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-mcp
+  namespace: monitoring
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    # Deliberately NO auth-url/auth-signin/etc here - same reasoning as
+    # networking/cilium/authentik-bypass-api-ingress.yaml (Hubble UI's streaming API).
+    # Token-based API clients (e.g. the Grafana MCP server, using a service account
+    # token) can't complete Authentik's cookie-based forward-auth login flow - a request
+    # hitting the auth_request subrequest with no session cookie gets redirected into
+    # the login page instead of reaching Grafana, and no API client can follow that.
+    #
+    # This is a SEPARATE HOSTNAME, not a second path on grafana.lab.example.com, and that's
+    # load-bearing, not cosmetic. First attempt was a path-based bypass on /api (same
+    # host) - broke the web UI outright: Grafana's own SSO (grafana.ini's auth.proxy)
+    # depends on Authentik injecting X-authentik-username on every request, and an
+    # unconditional /api bypass strips that header from the browser's own /api calls
+    # too, not just the MCP server's, so every session/plugins/live-ws call came back
+    # 401 and the frontend looped trying to recover. A canary Ingress with
+    # canary-by-header (split by whether Authorization: Bearer is present) looked like
+    # the fix but doesn't work here: ingress-nginx only splits traffic to a genuinely
+    # different backend, and canary + primary pointed at the identical Service here -
+    # confirmed live via a controller log warning ("alternative upstream ... is primary
+    # upstream ... for location grafana.lab.example.com/!") and requests kept hitting the
+    # same upstream regardless of the header. A dedicated hostname sidesteps all of this:
+    # the browser only ever calls same-origin grafana.lab.example.com, so it can stay
+    # fully Authentik-gated with headers intact, while the MCP server points at
+    # grafana-mcp.lab.example.com instead - no shared nginx location to conflict over.
+    # DNS needs no new record - *.lab.example.com is a wildcard (docs/network.md).
+    #
+    # Tradeoff, deliberate and accepted: this makes Grafana reachable without an
+    # Authentik login to anyone who can reach grafana-mcp.lab.example.com - LAN or WARP
+    # remote access (see networking/cloudflare-tunnel/README.md), not internet-exposed.
+    # Grafana's own auth still applies to every request here (service account token, or
+    # basic auth) - this only removes the Authentik layer, not all auth.
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - grafana-mcp.lab.example.com
+      secretName: grafana-mcp-tls
+  rules:
+    - host: grafana-mcp.lab.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kube-prometheus-stack-grafana
+                port:
+                  number: 80

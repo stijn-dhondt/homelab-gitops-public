@@ -42,8 +42,10 @@ All four use `--scope user` — see [the scope gotcha](#gotcha-scope-is-tied-to-
 below for why `--scope local` (the default) is the wrong choice here.
 
 ```bash
-# Grafana - token is a Viewer-role service account, generated once via Grafana's own API
-claude mcp add --env GRAFANA_URL=https://grafana.lab.example.com \
+# Grafana - token is a Viewer-role service account, generated once via Grafana's own API.
+# Points at the dedicated grafana-mcp.lab.example.com host, NOT grafana.lab.example.com - see
+# the gotcha below on why the two can't share a host.
+claude mcp add --env GRAFANA_URL=https://grafana-mcp.lab.example.com \
   --env GRAFANA_SERVICE_ACCOUNT_TOKEN=<token> \
   --scope user grafana -- uvx mcp-grafana
 
@@ -110,10 +112,40 @@ actually works.
 Every `*.lab.example.com` app including Grafana sits behind Authentik's cookie-based forward-auth (see
 `apps/authentik/README.md`). A token-authenticated API client has no session cookie, so nginx's
 `auth_request` redirects it into the login page instead of proxying the request — no API client can
-follow that. Fixed with a second Ingress, `grafana-api-bypass-ingress.yaml`
-(`monitoring/kube-prometheus-stack/`), for just the `/api` path, no Authentik annotations — same
-pattern already used for Hubble UI's streaming API. Grafana's own auth (the service account token)
-still gates everything through that path; only the Authentik layer is skipped.
+follow that.
+
+First fix attempt — wrong, broke the web UI: a second Ingress on the *same host*
+(`grafana.lab.example.com`), just for the `/api` path, no Authentik annotations — the same pattern that
+works fine for Hubble UI's streaming API. Broke Grafana's actual web UI outright (infinite "loading"
+loop) within the hour: Grafana's SSO (`grafana.ini`'s `auth.proxy` in `helmrelease.yaml`) isn't just
+gated by Authentik, it depends on Authentik *injecting* `X-authentik-username` on every request to
+know who's logged in. Bypassing Authentik on `/api` strips that header from the browser's own `/api`
+calls too (session checks, plugin settings, the live-ws heartbeat) — not just the MCP server's calls
+— so every one of those came back 401 and the frontend looped trying to recover. Confirmed live in
+Grafana's own logs: 100% of recent `/api/*` requests were `status=401 errorReason=Unauthorized
+error="cannot authenticate request"`.
+
+Second attempt — also wrong: an nginx canary Ingress (`canary-by-header`/`canary-by-header-pattern`)
+on the same host+path, meant to route only requests carrying `Authorization: Bearer ...` around
+Authentik while everything else kept going through the gated primary. Two problems hit in sequence:
+the admission webhook rejects any `canary-by-header-pattern` containing a literal space
+(`"^Bearer .+"` → `annotation canary-by-header-pattern contains invalid value`) — worked around with
+`"^Bearer.+"` instead, since `.` already matches the space. But the deeper problem: ingress-nginx's
+canary only works when the canary Ingress points at a genuinely *different* backend than the
+primary; ours pointed at the same `kube-prometheus-stack-grafana` Service, which the controller flags
+(`alternative upstream ... is primary upstream ... for location grafana.lab.example.com/!`) and then
+silently ignores — every request kept hitting the same upstream regardless of the header, auth
+annotations included, since those are baked into the shared nginx location, not chosen per-request.
+
+**Actual fix**: a dedicated *hostname*, `grafana-mcp.lab.example.com`
+(`grafana-mcp-ingress.yaml`, `monitoring/kube-prometheus-stack/`) — same backend Service, no
+Authentik annotations, no path tricks, no canary. The browser only ever calls same-origin
+`grafana.lab.example.com`, so it stays fully Authentik-gated with the SSO header intact; the MCP
+server's `GRAFANA_URL` points at the new host instead, using the service account token directly.
+No new DNS record needed — `*.lab.example.com` is a wildcard (`docs/network.md`), confirmed live with
+`dig`. Whenever a bypass is needed for an app whose own SSO depends on the forward-auth headers
+(unlike Hubble UI or n8n, which don't), reach for a separate hostname first — it's simpler and it
+actually works, where path-splitting and canary both failed here.
 
 ### Grafana and UniFi both need WARP connected (or being physically on the LAN)
 
