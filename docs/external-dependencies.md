@@ -56,13 +56,20 @@ the internal Pi-hole (`10.0.10.12`).
 |------|------|--------|
 | `example.com` | CNAME | `<tunnel-id>.cfargotunnel.com` |
 | `www.example.com` | CNAME | `<tunnel-id>.cfargotunnel.com` |
-| `jump.example.com` | CNAME | `<tunnel-id>.cfargotunnel.com` |
 
-`jump.example.com` is the [jumphost](../clusters/talos-dev/apps/jumphost/README.md) — the one
-internal-app gateway deliberately reachable from the public internet, unlike everything under
-`*.lab.example.com`. All three must stay proxied (orange cloud). As long as the same Cloudflare
-Tunnel is reused (not deleted and recreated), these records keep working across a cluster
-redeploy — the tunnel ID and secret live in `cloudflare-tunnel-credentials-sealed.yaml`, not in DNS.
+Both must stay proxied (orange cloud). As long as the same Cloudflare Tunnel is reused (not deleted
+and recreated), these records keep working across a cluster redeploy — the tunnel ID and secret
+live in `cloudflare-tunnel-credentials-sealed.yaml`, not in DNS.
+
+No other hostname under `example.com` should be publicly proxied — every internal admin UI is
+`*.lab.example.com`-only (see the internal split-DNS table below) and reachable exclusively via
+Cloudflare WARP (see `networking/cloudflare-tunnel/README.md`'s "Remote access via Cloudflare
+WARP"), never through a public DNS record. A public-facing jumphost app used to be a third
+exception here (removed from this repo — see git history if it reappears), and a couple of
+non-cluster services (NAS admin UI, an IPAM tool) had public CNAMEs added directly in Cloudflare's
+dashboard outside of git, which is exactly why they weren't caught sooner — those have since been
+removed from the zone too, but nothing here would have flagged them since they were never declared
+in this file to begin with.
 
 **Internal split-DNS (Pi-hole):**
 

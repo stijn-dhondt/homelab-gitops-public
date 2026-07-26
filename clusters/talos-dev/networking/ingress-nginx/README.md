@@ -1,7 +1,7 @@
 # ingress-nginx
 
-The Ingress controller every app in this cluster routes through — `*.lab.example.com`,
-`example.com`/`www.example.com` (via the Cloudflare Tunnel), and `jump.example.com`.
+The Ingress controller every app in this cluster routes through — `*.lab.example.com`, and
+`example.com`/`www.example.com` (via the Cloudflare Tunnel).
 
 ## Files in this folder
 

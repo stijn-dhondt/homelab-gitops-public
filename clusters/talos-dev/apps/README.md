@@ -12,7 +12,6 @@ persistent volumes, secrets, observability. `apps/` is where that plumbing gets 
 | [n8n](n8n/README.md) | Self-hosted workflow automation, at `n8n.lab.example.com` |
 | [WordPress](wordpress/README.md) | The public `example.com` site, with a bundled MariaDB |
 | [Authentik](authentik/README.md) | Identity provider / SSO, at `authentik.lab.example.com` — protects every other `*.lab.example.com` app under one shared login |
-| [Jumphost](jumphost/README.md) | Browser-accessible Ubuntu desktop at `jump.example.com` — the one thing intentionally reachable from the public internet, instead of exposing the internal apps directly |
 | [Forgejo](forgejo/README.md) | Self-hosted Git server, at `forgejo.lab.example.com` — deliberately not behind Authentik (would break `git clone`/`push` over HTTPS), keeps its own built-in auth |
 
 Each app's own README explains its files, how it's wired together, and how to do common

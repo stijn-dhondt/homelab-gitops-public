@@ -20,7 +20,6 @@ resources:
   - apps/wordpress
   - apps/n8n
   - apps/authentik
-  - apps/jumphost
   - apps/forgejo
   # monitoring
   - monitoring/namespace

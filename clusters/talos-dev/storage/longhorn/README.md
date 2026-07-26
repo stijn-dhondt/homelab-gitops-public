@@ -1,8 +1,8 @@
 # Longhorn
 
 Distributed block storage backed by local disk on each node — the `longhorn` `StorageClass` every
-app in this repo uses when it explicitly asks for it (n8n, WordPress, Authentik's Postgres, the
-jumphost's config volume, Grafana/Prometheus/Alertmanager). **Not** the cluster's default
+app in this repo uses when it explicitly asks for it (n8n, WordPress, Authentik's Postgres,
+Grafana/Prometheus/Alertmanager). **Not** the cluster's default
 `StorageClass` — that's `zfs-nfs` via democratic-csi (see `storage/democratic-csi/README.md`);
 Longhorn is used where local block storage makes more sense than NFS.
 

@@ -31,10 +31,9 @@ folder, and cross-cutting topics (hardware, network, the bootstrap runbook) unde
 - **Authentik** — SSO in front of every internal admin UI (Grafana, Prometheus, Alertmanager, n8n,
   Longhorn UI, Hubble UI), each gated by its own group, sharing one login. See
   [clusters/talos-dev/apps/authentik/README.md](clusters/talos-dev/apps/authentik/README.md).
-- **One deliberate way in from the internet** — a hardened jumphost (browser-accessible desktop,
-  MFA-required), rather than publishing any internal admin UI directly. Public apps
-  (`example.com`, WordPress) go through a Cloudflare Tunnel instead. See
-  [clusters/talos-dev/apps/jumphost/README.md](clusters/talos-dev/apps/jumphost/README.md) and
+- **Nothing internal is public** — every one of those admin UIs is `*.lab.example.com`-only, reachable
+  exclusively over Cloudflare Zero Trust WARP, never through a public DNS record. The only thing the
+  Cloudflare Tunnel exposes to the internet at all is the WordPress site (`example.com`). See
   [clusters/talos-dev/networking/cloudflare-tunnel/README.md](clusters/talos-dev/networking/cloudflare-tunnel/README.md).
 
 ## Documentation map
@@ -65,7 +64,7 @@ folder, and cross-cutting topics (hardware, network, the bootstrap runbook) unde
 [clusters/talos-dev/apps/README.md](clusters/talos-dev/apps/README.md) for the full index and the
 shared per-app file convention:
 - [n8n](clusters/talos-dev/apps/n8n/README.md), [WordPress](clusters/talos-dev/apps/wordpress/README.md),
-  [Authentik](clusters/talos-dev/apps/authentik/README.md), [Jumphost](clusters/talos-dev/apps/jumphost/README.md)
+  [Authentik](clusters/talos-dev/apps/authentik/README.md), [Forgejo](clusters/talos-dev/apps/forgejo/README.md)
 
 ## Work in progress
 

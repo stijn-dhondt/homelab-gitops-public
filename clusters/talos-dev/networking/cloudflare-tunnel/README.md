@@ -1,9 +1,9 @@
 # Cloudflare Tunnel
 
-The only way traffic reaches this cluster from the public internet — `example.com`, `www.example.com`,
-and `jump.example.com` (see `apps/jumphost/README.md`) all route in through here. There is
-deliberately no port-forwarding or public ingress exposure at the router; `cloudflared` makes an
-outbound-only connection to Cloudflare, which then proxies matching hostnames back through it.
+The only way traffic reaches this cluster from the public internet — `example.com` and
+`www.example.com` route in through here, and nothing else does. There is deliberately no
+port-forwarding or public ingress exposure at the router; `cloudflared` makes an outbound-only
+connection to Cloudflare, which then proxies matching hostnames back through it.
 
 Every `*.lab.example.com` app is **not** routed through this tunnel — those are internal-only,
 split-DNS-only (see [docs/external-dependencies.md](../../../../docs/external-dependencies.md)).
@@ -42,7 +42,7 @@ keep working unchanged — only the credentials secret needs restoring.
 Added because the homelab is behind Starlink's CGNAT — no public IP means a router-hosted VPN
 (WireGuard/UniFi Teleport/etc.) can't work, since nothing could open an inbound connection to it.
 This tunnel already proves outbound-only connectivity works fine through that CGNAT (it's how
-`example.com`/`jump.example.com` are reachable at all), so remote LAN access reuses it instead of
+`example.com` is reachable at all), so remote LAN access reuses it instead of
 standing up new infrastructure: Cloudflare Zero Trust's WARP client routes matching traffic through
 this same tunnel to specific private IP ranges, rather than only proxying the public hostnames
 above.

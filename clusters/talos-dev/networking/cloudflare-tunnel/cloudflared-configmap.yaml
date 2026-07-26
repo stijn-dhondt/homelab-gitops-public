@@ -24,11 +24,4 @@ data:
         service: https://ingress-nginx-controller.ingress-nginx.svc.cluster.local:443
         originRequest:
           originServerName: www.example.com
-      # The jumphost - see clusters/talos-dev/apps/jumphost/README.md. The only
-      # *.lab.example.com-equivalent app intentionally reachable from the public
-      # internet, hence its own example.com-level hostname rather than *.lab.example.com.
-      - hostname: jump.example.com
-        service: https://ingress-nginx-controller.ingress-nginx.svc.cluster.local:443
-        originRequest:
-          originServerName: jump.example.com
       - service: http_status:404
