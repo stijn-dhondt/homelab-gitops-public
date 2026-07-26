@@ -48,6 +48,8 @@ folder, and cross-cutting topics (hardware, network, the bootstrap runbook) unde
 - [docs/external-dependencies.md](docs/external-dependencies.md) — everything that lives outside
   git and won't come back from a redeploy alone (DNS records, NAS share permissions)
 - [docs/quick-reference.md](docs/quick-reference.md) — command cheat-sheet
+- [docs/claude-code-mcp.md](docs/claude-code-mcp.md) — Claude Code's MCP server setup (Grafana,
+  Cloudflare, GitHub, UniFi) and the gotchas hit getting there
 
 **Cluster-managed infrastructure** (`clusters/talos-dev/`):
 - [talos/](clusters/talos-dev/talos/README.md) — machine-config patches, Talos Image Factory schematic
