@@ -63,12 +63,14 @@ claude mcp add --env UNIFI_API_KEY=<key> \
   --scope user unifi -- unifi-mcp-server
 
 # Postgres - dedicated mcp_readonly user, read-only (--access-mode=restricted), via the
-# postgres-mcp-loadbalancer.yaml Service (apps/authentik/)
+# postgres-mcp-loadbalancer.yaml Service (apps/authentik/). Pinned to --python 3.12 - see the
+# pglast gotcha below.
 claude mcp add postgres -e DATABASE_URI="postgresql://mcp_readonly:<pw>@10.0.40.101:5432/authentik?sslmode=disable" \
-  --scope user -- uvx postgres-mcp --access-mode=restricted
+  --scope user -- uvx --python 3.12 postgres-mcp --access-mode=restricted
 
 # MariaDB - dedicated mcp_readonly user, read-only by default (no ALLOW_*_OPERATION flags set),
-# via the mariadb-mcp-loadbalancer.yaml Service (apps/wordpress/)
+# via the mariadb-mcp-loadbalancer.yaml Service (apps/wordpress/). Needs Node/npx - see the gotcha
+# below if this machine doesn't have it yet: brew install node
 claude mcp add mariadb -e MYSQL_HOST="10.0.40.102" -e MYSQL_PORT="3306" \
   -e MYSQL_USER="mcp_readonly" -e MYSQL_PASS="<pw>" -e MYSQL_DB="bitnami_wordpress" \
   --scope user -- npx @benborla29/mcp-server-mysql
@@ -189,6 +191,22 @@ credentials for this: both got a brand new `mcp_readonly` user, `GRANT`ed `SELEC
 consumed by an external MCP client on this machine, not by anything in-cluster, so there's nothing
 in git that needs them). Confirmed live before trusting it: reads succeed, a `DELETE` against either
 is rejected with a permission error.
+
+### `mariadb`/`n8n-mcp` failed to connect because Node was never installed on this machine
+
+Both run via `npx`. `claude mcp list` just says "Failed to connect" with no reason — confirmed the
+actual cause by running `which node npm npx` (all "not found"), not by anything MCP-specific. Fixed
+with `brew install node`; both connected immediately after, no re-add needed.
+
+### `postgres-mcp` failed to connect: `pglast` won't build on Python 3.14
+
+`postgres-mcp` depends on `pglast`, which ships no prebuilt wheel for this machine's Python (3.14,
+Homebrew's current default) and falls back to compiling from source — which fails outright against
+the current macOS SDK (`strchrnul` gets declared twice, once by `pglast`'s C code and once by the
+SDK's own `_string.h`). Confirmed by running `uvx postgres-mcp` directly outside of Claude Code to
+see the real build error, since `claude mcp get` only ever reports "Failed to connect" with no
+detail. Fixed by pinning the server to a Python version `pglast` does ship wheels for:
+`uvx --python 3.12 postgres-mcp` instead of plain `uvx postgres-mcp` — no other change needed.
 
 ## Health-check script
 
