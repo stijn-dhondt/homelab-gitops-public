@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-api-bypass
+  namespace: monitoring
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    # Deliberately NO auth-url/auth-signin/etc here - same pattern and same reasoning as
+    # networking/cilium/authentik-bypass-api-ingress.yaml (Hubble UI's streaming API).
+    # Token-based API clients (e.g. the Grafana MCP server, using a service account
+    # token) can't complete Authentik's cookie-based forward-auth login flow - a request
+    # hitting the auth_request subrequest with no session cookie gets redirected into
+    # the login page instead of reaching Grafana, and no API client can follow that.
+    #
+    # Tradeoff, deliberate and accepted: this makes /api reachable without an Authentik
+    # login to anyone who can reach grafana.lab.example.com - LAN or WARP remote access
+    # (see networking/cloudflare-tunnel/README.md), not internet-exposed. Narrower than
+    # Hubble's bypass, though: Grafana's own auth still applies to every request here
+    # (service account token, or basic auth) - this only removes the Authentik layer,
+    # not all auth.
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - grafana.lab.example.com
+      secretName: grafana-tls
+  rules:
+    - host: grafana.lab.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: kube-prometheus-stack-grafana
+                port:
+                  number: 80

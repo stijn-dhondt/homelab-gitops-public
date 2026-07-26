@@ -3,7 +3,20 @@
 Prometheus, Grafana, Alertmanager, and the standard Kubernetes metrics/rules bundle, deployed from
 the [prometheus-community](https://github.com/prometheus-community/helm-charts) chart. See
 `helmrelease.yaml`'s comments for the ingress/auth/storage details of each component — this file
-covers one specific, reused-elsewhere mechanism: how Grafana dashboards get into this cluster.
+covers two reused-elsewhere mechanisms: how Grafana dashboards get into this cluster, and how
+API clients reach Grafana without going through Authentik.
+
+## Grafana's API bypass ingress
+
+`grafana-api-bypass-ingress.yaml` — same pattern and reasoning as
+`networking/cilium/authentik-bypass-api-ingress.yaml` (Hubble UI's streaming API): a second
+`Ingress` on `grafana.lab.example.com`, just the `/api` path, with no Authentik forward-auth
+annotations. Needed because token-authenticated API clients (e.g. a Grafana MCP server using a
+service account token) can't complete Authentik's cookie-based login flow — nginx's `auth_request`
+sees no session cookie and redirects into the login page instead of proxying the request, which no
+API client can follow. Narrower than Hubble's bypass, though: this only removes the *Authentik*
+layer, Grafana's own auth (service account token, basic auth) still gates every request that
+reaches `/api` here.
 
 ## How dashboards get loaded
 
