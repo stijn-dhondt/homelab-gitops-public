@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-mcp
+  namespace: authentik
+  annotations:
+    # Raw TCP protocol (Postgres wire protocol) - ingress-nginx can't bypass-proxy this the way
+    # it does for Grafana/n8n's HTTP APIs, hence a dedicated LoadBalancer instead of an Ingress.
+    # Only reachable via the mcp_readonly user (see docs/claude-code-mcp.md) - real database
+    # auth is the only gate here, no Authentik/network-level auth in front of it.
+spec:
+  type: LoadBalancer
+  loadBalancerIP: "10.0.40.101"
+  selector:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/name: postgresql
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432

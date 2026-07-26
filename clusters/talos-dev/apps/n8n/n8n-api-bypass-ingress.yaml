@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: n8n-api-bypass
+  namespace: n8n
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    # Deliberately NO auth-url/auth-signin/etc here - same pattern and same reasoning as
+    # networking/monitoring/kube-prometheus-stack/grafana-api-bypass-ingress.yaml and
+    # networking/cilium/authentik-bypass-api-ingress.yaml (Hubble UI's streaming API).
+    # Token-based API clients (e.g. the n8n-mcp server, using an n8n API key) can't complete
+    # Authentik's cookie-based forward-auth login flow - a request hitting the auth_request
+    # subrequest with no session cookie gets redirected into the login page instead of
+    # reaching n8n, and no API client can follow that.
+    #
+    # Tradeoff, deliberate and accepted: this makes /api reachable without an Authentik login
+    # to anyone who can reach n8n.lab.example.com - LAN or WARP remote access, not
+    # internet-exposed. n8n's own API key auth still applies to every request through here -
+    # only the Authentik layer is removed.
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - n8n.lab.example.com
+      secretName: n8n-tls
+  rules:
+    - host: n8n.lab.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: n8n
+                port:
+                  number: 80

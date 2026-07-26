@@ -8,3 +8,4 @@ resources:
   - authentik-outpost-service.yaml
   - authentik-outpost-ingress.yaml
   - helmrelease.yaml
+  - n8n-api-bypass-ingress.yaml

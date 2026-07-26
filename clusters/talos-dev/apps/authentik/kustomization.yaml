@@ -9,3 +9,4 @@ resources:
   - blueprint-sso-configmap.yaml
   - authentik-app-icons-configmap.yaml
   - helmrelease.yaml
+  - postgres-mcp-loadbalancer.yaml
