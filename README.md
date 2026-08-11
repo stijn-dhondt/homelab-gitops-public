@@ -70,7 +70,7 @@ shared per-app file convention:
 
 - [ ] Use Talos Omni for fully automated cluster deployment via dashboard
 - [ ] Enable Secure Boot after initial deployment
-- [ ] Implement automated backups of etcd
+- [X] Implement automated backups of etcd
 
 ## Ownership
 
