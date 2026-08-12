@@ -87,20 +87,16 @@ cp-02.local               → 10.0.20.12
 cp-03.local               → 10.0.20.13
 wrkr-01.local             → 10.0.20.21
 *.svc.cluster.local       → CoreDNS (Cilium managed)
+*.lab.example.com           → 10.0.40.100  (wildcard, ingress VIP — see external-dependencies.md
+                                             for the specific hostnames actually served through it)
 ```
 
-**External DNS (non-cluster services on the same Cloudflare zone):**
-
-```
-omv.example.com           → 10.0.10.11:1080  (NAS admin interface - OMV)
-code.example.com          → 10.0.10.11:8443  (VS Code Server used for local coding)
-```
-
-These two are unrelated to the Kubernetes cluster's ingress — direct exposures of other services
-on the same domain. The cluster's *own* DNS records (Cloudflare Tunnel + Pi-hole split-DNS for
-`*.lab.example.com` and the public apps) are tracked separately in
-[external-dependencies.md](external-dependencies.md), since those are the ones that actually need
-recreating after a cluster rebuild.
+Two non-cluster services (`omv.example.com`, a NAS admin interface, and `code.example.com`, a VS Code
+Server) previously had public CNAMEs added directly in Cloudflare's dashboard outside of git — both
+have since been removed from the zone (see
+[external-dependencies.md](external-dependencies.md)'s "DNS records" section). The cluster's *own*
+DNS records (Cloudflare Tunnel + the Pi-hole wildcard above, and the public apps) are tracked
+separately there, since those are the ones that actually need recreating after a cluster rebuild.
 
 ## Network Policies
 

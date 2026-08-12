@@ -21,6 +21,7 @@ chart, managed by Flux like every other app in this repo.
 | `wordpress-mariadb-credentials-sealed.yaml` | A `SealedSecret` holding the MariaDB `root`, application, replication, and metrics-exporter passwords. |
 | `ingress-www-redirect.yaml` | A second, standalone `Ingress` for `www.example.com` that just 301-redirects to `https://example.com`. It's separate from the chart's own ingress because the chart only manages one hostname. |
 | `grafana-dashboard-configmap.yaml` | MariaDB connections/query rate/slow queries ([grafana.com #7362](https://grafana.com/grafana/dashboards/7362-mysql-overview/), Percona's popular `mysqld_exporter`-format dashboard — matches the metrics the chart's bundled exporter already produces). Auto-loaded by Grafana's sidecar, see `monitoring/kube-prometheus-stack/README.md`. |
+| `mariadb-mcp-loadbalancer.yaml` | A `LoadBalancer` Service exposing MariaDB directly (`10.0.40.102:3306`) via a read-only `mcp_readonly` user, for the `mariadb` Claude Code MCP integration — see `docs/claude-code-mcp.md`. |
 | `kustomization.yaml` | Lists all the files above so Flux applies them together. Referenced from `clusters/talos-dev/kustomization.yaml`. |
 
 ## How it fits together
@@ -85,7 +86,7 @@ Push the change; Flux/Helm resizes the PVCs in place.
 spec:
   chart:
     spec:
-      version: "32.1.13"  # bump to a newer chart version
+      version: "33.0.4"  # bump to a newer chart version
 ```
 Check the [chart's changelog](https://github.com/bitnami/charts/tree/main/bitnami/wordpress) before bumping — a chart version bump can pull in a newer WordPress (and MariaDB) release too.
 

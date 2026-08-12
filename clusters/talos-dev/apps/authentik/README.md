@@ -191,6 +191,8 @@ Non-obvious things, all found by testing against the live cluster rather than as
 | `authentik-postgresql-credentials-sealed.yaml` | A `SealedSecret` holding the password for the bundled PostgreSQL's `authentik` user. |
 | `authentik-bootstrap-token-sealed.yaml` | A `SealedSecret` holding a non-expiring API token for `akadmin`. See [API access](#api-access) below. |
 | `blueprint-sso-configmap.yaml` | An Authentik ["blueprint"](https://docs.goauthentik.io/docs/customize/blueprints/) — config-as-code for every protected app's Group/Provider/Application/Outpost binding, described in [How apps get protected](#how-apps-get-protected). Mounted into the worker pod and applied automatically by Authentik itself, not by Flux/Kubernetes. |
+| `authentik-app-icons-configmap.yaml` | Self-hosted SVG icons for the Authentik app list, mounted into the server pod (see `helmrelease.yaml`). |
+| `postgres-mcp-loadbalancer.yaml` | A `LoadBalancer` Service exposing Postgres directly (`10.0.40.101:5432`) via a read-only `mcp_readonly` user, for the `postgres` Claude Code MCP integration — see `docs/claude-code-mcp.md`. |
 | `kustomization.yaml` | Lists all the files above so Flux applies them together. Referenced from `clusters/talos-dev/kustomization.yaml`. |
 
 ## How it fits together

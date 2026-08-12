@@ -73,10 +73,15 @@ in this file to begin with.
 
 **Internal split-DNS (Pi-hole):**
 
+`*.lab.example.com` is a single wildcard record pointing at `10.0.40.100` (the ingress VIP) —
+confirmed live with `dig`. It covers every `*.lab.example.com` hostname, including any added later
+without a DNS change. The hosts actually in use today:
+
 | Host | Target |
 |------|--------|
 | `example.com` | `10.0.40.100` |
 | `grafana.lab.example.com` | `10.0.40.100` |
+| `grafana-mcp.lab.example.com` | `10.0.40.100` |
 | `prometheus.lab.example.com` | `10.0.40.100` |
 | `alertmanager.lab.example.com` | `10.0.40.100` |
 | `longhorn.lab.example.com` | `10.0.40.100` |
@@ -85,6 +90,8 @@ in this file to begin with.
 | `hubble.lab.example.com` | `10.0.40.100` |
 | `forgejo.lab.example.com` | `10.0.40.100` |
 
-These exist purely so LAN clients hit the ingress VIP directly instead of round-tripping through
-the Cloudflare tunnel. Rebuilding onto new infrastructure (new NAS, new Pi-hole instance, etc.)
-means recreating all of the above by hand.
+`example.com` itself is a separate, non-wildcard entry (the bare domain isn't covered by a
+`*.lab.example.com` wildcard). These exist purely so LAN clients hit the ingress VIP directly instead
+of round-tripping through the Cloudflare tunnel. Rebuilding onto new infrastructure (new NAS, new
+Pi-hole instance, etc.) means recreating the wildcard record (and the bare-domain one) by hand —
+the per-host table above is for reference, not something to recreate entry-by-entry.

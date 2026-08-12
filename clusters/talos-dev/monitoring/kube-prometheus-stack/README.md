@@ -115,17 +115,17 @@ kubectl logs -n monitoring -l app.kubernetes.io/name=grafana -c grafana-sc-dashb
 kubectl get configmap -A -l grafana_dashboard=1
 ```
 
-**Check Prometheus's actual disk usage** — don't trust the Longhorn dashboard's "Volume Capacity"
-panel for this (see that dashboard's own gotcha, in `storage/longhorn/README.md`, about it scaling
-relative to the largest volume in the cluster rather than showing real usage). Use kubelet's own
-volume stats instead, the same source `df` would show:
+**Check Prometheus's actual disk usage** — don't rely on the Longhorn dashboard's "Volume Capacity"
+panel for this; its accounting hasn't been verified against real per-PVC used/total bytes. Use
+kubelet's own volume stats instead, the same source `df` would show:
 ```promql
 kubelet_volume_stats_used_bytes{persistentvolumeclaim=~"prometheus-.*"}
 kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~"prometheus-.*"}
 ```
 
 **Grow Prometheus's storage** (Longhorn's `allowVolumeExpansion` is enabled, so this is
-online/non-disruptive) — grown from 5Gi to 10Gi on 2026-07-25 after kubelet reported ~70% used:
+online/non-disruptive) — grown from 5Gi to 10Gi on 2026-07-25, then 10Gi to 20Gi on 2026-08-08,
+both times after kubelet reported usage climbing past ~70%:
 ```yaml
 # helmrelease.yaml, under prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests
 storage: 20Gi  # bump this

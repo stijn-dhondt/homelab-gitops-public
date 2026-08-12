@@ -6,8 +6,10 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
     # Deliberately NO auth-url/auth-signin/etc here - same pattern and same reasoning as
-    # networking/monitoring/kube-prometheus-stack/grafana-api-bypass-ingress.yaml and
-    # networking/cilium/authentik-bypass-api-ingress.yaml (Hubble UI's streaming API).
+    # networking/cilium/authentik-bypass-api-ingress.yaml (Hubble UI's streaming API). Grafana's
+    # own bypass (monitoring/kube-prometheus-stack/grafana-mcp-ingress.yaml) had to use a
+    # different approach - see docs/claude-code-mcp.md - because Grafana's SSO depends on the
+    # forward-auth headers in a way n8n and Hubble UI don't.
     # Token-based API clients (e.g. the n8n-mcp server, using an n8n API key) can't complete
     # Authentik's cookie-based forward-auth login flow - a request hitting the auth_request
     # subrequest with no session cookie gets redirected into the login page instead of

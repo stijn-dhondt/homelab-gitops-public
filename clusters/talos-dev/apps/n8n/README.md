@@ -16,7 +16,9 @@ every other app in this repo.
 | `helmrepository.yaml` | Tells Flux where to pull the chart from: the `n8n` chart from `oci://8gears.container-registry.com/library`. |
 | `helmrelease.yaml` | The actual deployment — chart version, ingress hostname, storage, and app config. This is the file you'll edit most. |
 | `n8n-encryption-key-sealed.yaml` | A `SealedSecret` holding `N8N_ENCRYPTION_KEY`. See [Encryption key](#encryption-key-important) below — **do not delete or regenerate this casually**. |
-| `kustomization.yaml` | Lists the four files above so Flux applies them together. Referenced from `clusters/talos-dev/kustomization.yaml`. |
+| `authentik-auth-headers-configmap.yaml`, `authentik-outpost-service.yaml`, `authentik-outpost-ingress.yaml` | Forward-auth plumbing shared with every protected app — see `apps/authentik/README.md`'s "How apps get protected". |
+| `n8n-api-bypass-ingress.yaml` | A deliberate, documented exception: n8n's `/api` path bypasses Authentik's forward-auth gate so token-based API clients (e.g. the `n8n-mcp` Claude Code integration) can authenticate with n8n's own API key instead of a browser session cookie. See [docs/claude-code-mcp.md](../../../../docs/claude-code-mcp.md). |
+| `kustomization.yaml` | Lists all the files above so Flux applies them together. Referenced from `clusters/talos-dev/kustomization.yaml`. |
 
 ## How it fits together
 
@@ -27,7 +29,8 @@ every other app in this repo.
    - Set `GENERIC_TIMEZONE` so cron/schedule-trigger nodes fire at the expected local time.
    - Mount a `longhorn` PersistentVolumeClaim at `/home/node/.n8n`, which holds the SQLite database (workflows, credentials, execution history) and any binary data written to disk.
    - Inject `N8N_ENCRYPTION_KEY` from the `SealedSecret` as an environment variable, instead of using the chart's built-in `main.secret` (which would store the value in this file, in plaintext, in git).
-4. The chart's `ingress.yaml` template creates an `Ingress` for `n8n.lab.example.com`, annotated so `cert-manager` requests a Let's Encrypt certificate via `letsencrypt-production` and stores it in the `n8n-tls` secret.
+4. The chart's `ingress.yaml` template creates an `Ingress` for `n8n.lab.example.com`, annotated so `cert-manager` requests a Let's Encrypt certificate via `letsencrypt-production`, gated behind Authentik's forward-auth (same `auth-url`/`auth-signin` pattern as every other app — see `apps/authentik/README.md`'s "How apps get protected"), and stores the cert in the `n8n-tls` secret.
+5. `n8n-api-bypass-ingress.yaml` creates a second `Ingress`, same host, just the `/api` path, with no Authentik annotations — so the `n8n-mcp` Claude Code integration can reach n8n's API using its own API key, without needing to complete Authentik's cookie-based login flow.
 
 No manual Helm install is required — pushing to `prod` is enough. Flux reconciles every 5 minutes (`spec.interval`), or force it immediately:
 
@@ -108,7 +111,7 @@ automatically via the built-in `flux` manager.
 # helmrelease.yaml (under values:)
 image:
   # renovate: datasource=docker depName=n8nio/n8n versioning=semver-coerced
-  tag: "2.31.5"
+  tag: "2.35.0"
 ```
 Renovate opens a PR for this one too — see [Keeping n8n up to date](#keeping-n8n-up-to-date) above for why it needs its own tracking.
 

@@ -107,7 +107,7 @@ tracks `spec.chart.spec.version` automatically, no extra `customManagers` entry 
 spec:
   chart:
     spec:
-      version: "17.1.3"  # bump to a newer chart version
+      version: "17.1.4"  # bump to a newer chart version
 ```
 Check the [chart's releases](https://code.forgejo.org/forgejo-helm/forgejo-helm/releases) first.
 

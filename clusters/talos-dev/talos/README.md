@@ -8,8 +8,8 @@ machine config is applied by hand, from a client machine, via `talosctl` — the
 `clusters/talos-dev/kustomization.yaml`. These files are committed purely so a from-scratch
 rebuild is reproducible, not because anything reads them automatically.
 
-For the actual step-by-step commands (`talosctl gen config`, `apply-config`, bootstrap), see the
-root README's ["Cluster Deployment"](../../../README.md) section — this file explains *why each
+For the actual step-by-step commands (`talosctl gen config`, `apply-config`, bootstrap), see
+[docs/cluster-bootstrap.md](../../../docs/cluster-bootstrap.md) — this file explains *why each
 file here exists*, not the deployment walkthrough itself.
 
 ## Why these files and not others
@@ -88,8 +88,8 @@ apply-config -p @<file>.yaml` alongside `cni-patch.yaml`. Each sets:
 
 That last part used to live in a separate shared `disk-patch.yaml`. It was deleted and folded
 directly into each node's own file on 2026-07-22 (`6fe78a0`, "cleanup config files") — see
-[Known drift](#known-drift-worth-fixing) below, since the root README's deployment commands still
-reference the old file.
+[Resolved drift](#resolved-drift) below for how the bootstrap docs were brought back in sync with
+this.
 
 ### `config/metrics-patch.yaml`
 
@@ -183,7 +183,7 @@ rather than bootstrap a new one.
 
 ## Resolved drift
 
-The root README's ["Cluster Deployment"](../../../README.md) section used to show
+[docs/cluster-bootstrap.md](../../../docs/cluster-bootstrap.md)'s deployment commands used to show
 `-p @disk-patch.yaml` in every `talosctl apply-config` example, left over from before that file was
 folded into each `config/cp-0X.yaml` / `config/wrkr-01.yaml` on 2026-07-22. Those commands have
 since been updated to drop the stale flag (and a `taloscctl` typo on the CP-03 command was fixed
