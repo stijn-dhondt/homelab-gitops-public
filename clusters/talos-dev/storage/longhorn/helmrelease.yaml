@@ -25,6 +25,10 @@ spec:
     defaultSettings:
       defaultDataPath: /var/lib/longhorn
       replicaAutoBalance: best-effort
+      # Without this, a volume with no running workload (e.g. cluster-backup-data between its
+      # 01:00 CronJob run and the 02:00 nightly-backup RecurringJob) sits detached, and the
+      # RecurringJob silently skips it instead of attaching it to back it up. See issue #15.
+      allowRecurringJobWhileVolumeDetached: true
     defaultBackupStore: 
       backupTarget: "nfs://10.0.50.100:/Longhorn"
       backupTargetCredentialSecret: ""

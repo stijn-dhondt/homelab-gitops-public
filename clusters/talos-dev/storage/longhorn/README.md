@@ -17,12 +17,22 @@ online/non-disruptive — every `apps/*/README.md`'s "grow the storage" section 
 |------|---------|
 | `namespace.yaml` | Creates the `longhorn-system` namespace. |
 | `helmrepository.yaml` | The `longhorn` chart from `https://charts.longhorn.io`. |
-| `helmrelease.yaml` | Data path, replica auto-balancing, the NFS backup target, and the deliberate `persistence.defaultClass: false` (see above). |
+| `helmrelease.yaml` | Data path, replica auto-balancing, the NFS backup target, `allowRecurringJobWhileVolumeDetached` (see below), and the deliberate `persistence.defaultClass: false` (see above). |
 | `recurringjob-nightly.yaml` | A `RecurringJob` — nightly backup at 02:00, 14 days retention, 2 concurrent. Applies to volumes in the `default` group (Longhorn's implicit group every volume belongs to unless configured otherwise). |
 | `ingress.yaml` | Longhorn's own UI, at `longhorn.lab.example.com` — forward-auth annotations, see the authentik README's "How apps get protected". |
 | `authentik-auth-headers-configmap.yaml`, `authentik-outpost-service.yaml` | Forward-auth plumbing shared with every protected app. |
 | `servicemonitor.yaml` | Prometheus scrape config for Longhorn's own metrics. |
 | `grafana-dashboard-configmap.yaml` | Volume health/replica status/disk usage per PV — the dashboard Longhorn's own docs recommend ([grafana.com #17626](https://grafana.com/grafana/dashboards/17626)). Auto-loaded by Grafana's sidecar, see `monitoring/kube-prometheus-stack/README.md`. |
+
+## Detached volumes need `allowRecurringJobWhileVolumeDetached`
+
+A volume with no running workload attached to it (e.g. a PVC only ever mounted by a `CronJob` pod
+that has already completed, like `cluster-backup-data` — see `backup/cluster-backup/README.md`) is
+**detached** most of the time. By default Longhorn's `nightly-backup` `RecurringJob` silently skips
+detached volumes instead of attaching them — no error, no event, the `RecurringJob` object looks
+fine, the volume just never gets backed up (issue #15). `helmrelease.yaml` sets
+`allowRecurringJobWhileVolumeDetached: true` globally so any currently-detached volume gets
+attached just long enough for its scheduled backup, then detached again.
 
 ## The NAS backup share needs manual permissions (not in git)
 

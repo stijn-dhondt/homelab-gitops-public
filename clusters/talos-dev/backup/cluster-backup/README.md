@@ -7,6 +7,12 @@ night. Since it's a plain `longhorn`-class volume, it's automatically covered by
 retention logic here. That job already backs up every Longhorn volume in the cluster nightly with
 14 days of history; this volume just rides along.
 
+This volume has no long-running workload keeping it attached — the `CronJob` pod that writes to it
+exits right after each `01:00` run, so by `02:00` it's typically detached. Without
+`allowRecurringJobWhileVolumeDetached: true` on the Longhorn `HelmRelease` (`storage/longhorn`),
+the nightly `RecurringJob` would silently skip it instead of attaching it to take the backup — that
+was issue #15. That setting is what actually makes "rides along for free" true here.
+
 - **Namespace:** `cluster-backup`
 - **Storage:** 2Gi on Longhorn (an etcd snapshot on this cluster is ~85MB; plenty of headroom)
 - **Schedule:** `01:00` daily — an hour before Longhorn's own `02:00` nightly backup run
