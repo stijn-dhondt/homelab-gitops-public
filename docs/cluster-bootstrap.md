@@ -60,8 +60,8 @@ one is and why. For a from-scratch rebuild, reuse them as-is rather than recreat
 ```bash
 talosctl gen config my-cluster https://10.0.20.10:6443 \
   --config-patch @clusters/talos-dev/talos/config/cni-patch.yaml \
-  --talos-version v1.13.3 \
-  --install-image factory.talos.dev/installer/<schematic-id>:v1.13.3 \
+  --talos-version v1.13.6 \
+  --install-image factory.talos.dev/installer/<schematic-id>:v1.13.6 \
   --force
 ```
 
@@ -113,7 +113,7 @@ can schedule, which means Flux can't run either.
 
 ```bash
 helm install cilium cilium/cilium \
-  --version 1.18.0 \
+  --version 1.20.0 \
   --namespace kube-system \
   --set kubeProxyReplacement=true \
   --set k8sServiceHost=localhost \

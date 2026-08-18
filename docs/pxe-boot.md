@@ -45,7 +45,7 @@ services:
     network_mode: host # Required for DHCP proxy functionality
     restart: unless-stopped
     command:
-      - --talos-version=v1.13.3 # Define Talos version to be used
+      - --talos-version=v1.13.6 # Define Talos version to be used
       - --schematic-id=<schematic-id> # ← from Step 1, or clusters/talos-dev/talos/README.md
 ```
 
