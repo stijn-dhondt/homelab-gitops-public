@@ -8,5 +8,6 @@ resources:
   - authentik-outpost-service.yaml
   - ingress.yaml
   - recurringjob-nightly.yaml
+  - recurringjob-trim.yaml
   - servicemonitor.yaml
   - grafana-dashboard-configmap.yaml

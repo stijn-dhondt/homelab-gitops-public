@@ -1,0 +1,11 @@
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: nightly-trim
+  namespace: longhorn-system
+spec:
+  cron: "0 3 * * *"
+  task: "filesystem-trim"
+  groups:
+    - default
+  concurrency: 2
