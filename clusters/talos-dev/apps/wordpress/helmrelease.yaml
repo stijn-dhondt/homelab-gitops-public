@@ -16,7 +16,7 @@ spec:
   chart:
     spec:
       chart: wordpress
-      version: "33.0.4"
+      version: "33.0.7"
       sourceRef:
         kind: HelmRepository
         name: bitnami
