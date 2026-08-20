@@ -1,0 +1,82 @@
+version: "3.8"
+
+# ---------------------------------------------------------------------------
+# Self-hosted Sidero Omni stack for Portainer.
+#
+# Before deploying this stack, run setup-host-prereqs.sh ONCE directly on the
+# Docker host (not through Portainer) to generate:
+#   ca.pem, server-key.pem, server-chain.pem   -> TLS certs
+#   omni.asc                                    -> etcd encryption key
+#   dex.yaml                                     -> Dex OIDC config
+#
+# All of those files must live in the SAME directory as this compose file on
+# the Docker host's filesystem, because Portainer mounts them with relative
+# bind paths ("./file"). If you deploy this stack from Portainer's Git repo
+# or Web editor method, set the stack's working directory to that folder, or
+# switch to Portainer's "Upload" method and upload this folder as-is.
+#
+# Set the variables below in Portainer: Stacks -> your stack -> Environment
+# variables (or edit the .env.example file and rename it to .env next to
+# this compose file).
+# ---------------------------------------------------------------------------
+
+services:
+  dex:
+    image: ghcr.io/dexidp/dex:v2.41.1
+    container_name: dex
+    restart: unless-stopped
+    ports:
+      - "5556:5556"
+    volumes:
+      - ./dex.yaml:/etc/dex/dex.yaml:ro
+      - ./server-key.pem:/etc/dex/tls/server-key.pem:ro
+      - ./server-chain.pem:/etc/dex/tls/server-chain.pem:ro
+    command: ["dex", "serve", "/etc/dex/dex.yaml"]
+
+  omni:
+    image: ghcr.io/siderolabs/omni:${OMNI_VERSION}
+    container_name: omni
+    restart: unless-stopped
+    # Omni needs host networking + a real TUN device for the WireGuard
+    # (SideroLink) mesh it establishes with Talos machines. It cannot run in
+    # Portainer's normal bridge networking mode.
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ./ca.pem:/etc/ssl/certs/ca-certificates.crt:ro
+      - ./server-key.pem:/server-key.pem:ro
+      - ./server-chain.pem:/server-chain.pem:ro
+      - ./omni.asc:/omni.asc:ro
+      - ./sqlite:/_out/sqlite:rw
+    command:
+      - --name=omni
+      - --cert=/server-chain.pem
+      - --key=/server-key.pem
+      - --machine-api-cert=/server-chain.pem
+      - --machine-api-key=/server-key.pem
+      - --machine-api-bind-addr=0.0.0.0:8090
+      - --private-key-source=file:///omni.asc
+      - --event-sink-port=8091
+      - --bind-addr=0.0.0.0:443
+      - --k8s-proxy-bind-addr=0.0.0.0:8100
+      - --advertised-api-url=https://${OMNI_ENDPOINT}/
+      - --siderolink-api-advertised-url=https://${OMNI_ENDPOINT}:8090/
+      - --siderolink-wireguard-advertised-addr=${HOST_PUBLIC_IP}:50180
+      - --advertised-kubernetes-proxy-url=https://${OMNI_ENDPOINT}:8100/
+      - --auth-auth0-enabled=false
+      - --auth-oidc-enabled=true
+      - --auth-oidc-provider-url=https://${AUTH_ENDPOINT}:5556
+      - --auth-oidc-client-id=omni
+      - --auth-oidc-client-secret=omni-dex-secret
+      - --auth-oidc-scopes=openid
+      - --auth-oidc-scopes=profile
+      - --auth-oidc-scopes=email
+      - --sqlite-storage-path=/_out/sqlite/omni.db
+      - --initial-users=${OMNI_USER_EMAIL}
+      - --eula-accept-name=${EULA_NAME}
+      - --eula-accept-email=${EULA_EMAIL}
+    depends_on:
+      - dex

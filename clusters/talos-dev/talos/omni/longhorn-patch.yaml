@@ -1,0 +1,92 @@
+# Self-hosted Sidero Omni on Portainer
+
+Manages/deploys Talos Linux clusters (your home cluster) through a
+self-hosted Omni instance running as two containers: **Dex** (OIDC login)
+and **Omni** itself.
+
+Why this isn't a pure "paste into Portainer and go" stack: Omni needs TLS
+certificates, an etcd encryption key, and an OIDC identity provider config
+*before* it can start. Those are one-time secrets/config files generated on
+the host — Portainer's stack editor can't generate them for you, but once
+they exist, Portainer runs the actual containers normally.
+
+## 1. Prep the host (once, over SSH — not through Portainer)
+
+SSH into the Docker host that Portainer manages, make a folder, and drop in
+these four files: `docker-compose.yml`, `.env.example`, `setup-host-prereqs.sh`,
+this `README.md`.
+
+```bash
+mkdir -p ~/omni && cd ~/omni
+# copy the 4 files here
+chmod +x setup-host-prereqs.sh
+
+export OMNI_ENDPOINT=omni.internal      # or a real domain if you want it reachable outside your LAN
+export AUTH_ENDPOINT=auth.internal
+export OMNI_USER_EMAIL=admin@omni.internal
+./setup-host-prereqs.sh
+```
+
+You'll be prompted once for the Omni admin password. When it finishes you'll
+have `ca.pem`, `server-key.pem`, `server-chain.pem`, `omni.asc`, `dex.yaml`,
+and an empty `sqlite/` dir sitting next to `docker-compose.yml`.
+
+Then fill in the real values:
+
+```bash
+cp .env.example .env
+# edit .env: set OMNI_VERSION (latest tag from
+# https://github.com/siderolabs/omni/releases/latest), HOST_PUBLIC_IP, etc.
+```
+
+## 2. Open the ports
+
+On the host / your router, allow: `443/tcp` (UI), `8090/tcp` (SideroLink
+API), `8091/tcp` (event sink), `8100/tcp` (k8s proxy), `5556/tcp` (Dex),
+`50180/udp` (WireGuard mesh to your Talos nodes).
+
+## 3. Deploy the stack in Portainer
+
+- **Stacks → Add stack**
+- Name it (e.g. `omni`)
+- Build method: pick **Upload** and upload the whole `~/omni` folder (so the
+  bind-mount paths in the compose file resolve), or **Web editor** and paste
+  `docker-compose.yml` — but then you must set the stack's **working
+  directory** to `~/omni` on the host, since the `./ca.pem` etc. paths are
+  relative to that.
+- Under **Environment variables**, either paste the contents of your `.env`
+  or add each variable individually (`OMNI_VERSION`, `OMNI_ENDPOINT`,
+  `AUTH_ENDPOINT`, `HOST_PUBLIC_IP`, `OMNI_USER_EMAIL`, `EULA_NAME`,
+  `EULA_EMAIL`).
+- Deploy.
+
+`omni` uses `network_mode: host` and `NET_ADMIN` + `/dev/net/tun` — this is
+required (Omni runs a WireGuard mesh to your Talos machines) and works fine
+under Portainer as long as the underlying Docker host supports it (it will
+on Linux; it will **not** work on Docker Desktop for Mac/Windows).
+
+## 4. Log in
+
+On the machine you'll browse from: trust `ca.pem` (copy it off the host) and
+map `omni.internal` / `auth.internal` to the host's IP in your local hosts
+file — same as the official self-hosted guide. Then open
+`https://omni.internal` and sign in with the email/password from step 1.
+
+## 5. Point it at your home cluster
+
+Once logged in, Omni will show you a `talosctl` / PXE / ISO-based flow (under
+**Machines**) to boot your bare-metal or VM nodes into Talos maintenance
+mode; they'll join automatically via the SideroLink WireGuard tunnel once
+they can reach the host on the ports above. From there you create a cluster
+in the Omni UI and it handles the Talos config generation and rollout.
+
+## Notes / gotchas
+
+- Self-hosted Omni is under Sidero's Business Source License — free for
+  non-production/home-lab use, but it does display a EULA prompt if you
+  skip the `EULA_NAME`/`EULA_EMAIL` flags.
+- Certs expire in 1 year (`8760h` in `ca-config.json`) — re-run the cert
+  generation portion of `setup-host-prereqs.sh` before then.
+- If you don't want to run Dex at all, you can point `--auth-oidc-*` at an
+  existing OIDC/SAML provider you already run instead, and drop the `dex`
+  service from the compose file.
