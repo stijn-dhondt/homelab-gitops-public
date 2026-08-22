@@ -30,6 +30,8 @@ spec:
     updateStrategy:
       type: Recreate
 
+    customHTAccessCM: wordpress-security-headers
+
     persistence:
       storageClass: longhorn
       size: 4Gi

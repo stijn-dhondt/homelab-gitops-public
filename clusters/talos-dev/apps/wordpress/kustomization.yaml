@@ -8,4 +8,5 @@ resources:
   - helmrelease.yaml
   - ingress-www-redirect.yaml
   - grafana-dashboard-configmap.yaml
+  - wordpress-security-headers-configmap.yaml
   - mariadb-mcp-loadbalancer.yaml
