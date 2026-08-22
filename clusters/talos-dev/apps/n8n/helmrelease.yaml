@@ -29,7 +29,7 @@ spec:
     # customManagers entry in renovate.json and the "Keeping n8n up to date" section below.
     image:
       # renovate: datasource=docker depName=n8nio/n8n versioning=semver-coerced
-      tag: "2.36.2"
+      tag: "2.36.5"
 
     main:
       config:
