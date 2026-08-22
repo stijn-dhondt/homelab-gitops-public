@@ -25,6 +25,11 @@ spec:
   values:
     existingSecret: wordpress-credentials
 
+    # RollingUpdate can't attach the RWO PVC to a surge pod while the old
+    # pod still holds it, so upgrades stall with a Multi-Attach error.
+    updateStrategy:
+      type: Recreate
+
     persistence:
       storageClass: longhorn
       size: 4Gi
