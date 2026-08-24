@@ -1,6 +1,6 @@
 # Summary: Lab Platform Achievements
 
-## Executive overview
+## Overview
 
 This repository represents a fully functioning, secure, and operational Kubernetes platform that has already moved beyond a proof of concept. The environment is built on bare-metal infrastructure, managed with GitOps, and designed to be reproducible, secure, and easy to extend.
 
