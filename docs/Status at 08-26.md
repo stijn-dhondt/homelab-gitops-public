@@ -73,7 +73,7 @@ The environment already has the essential characteristics of a real platform:
 - workloads are running in a managed and repeatable way
 - documentation is in place to support operations and future scaling
 
-The remaining items in the repository are enhancement opportunities rather than foundational gaps. They include future improvements such as Talos Omni automation and Secure Boot hardening, not basic missing functionality.
+The remaining items in the repository are enhancement opportunities rather than foundational gaps. They include future improvements such as Talos Omni automation, Secure Boot hardening and Fast Full DR restore from git (not backup), so not basic missing functionality.
 
 ## Bottom line
 
