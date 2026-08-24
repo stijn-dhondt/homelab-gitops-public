@@ -37,7 +37,7 @@ spec:
                   # (3.67Gi/5Gi) and climbing, with 31d retention and scrape targets
                   # added over time (cert-manager, ingress-nginx, Cilium, Longhorn,
                   # MariaDB). Longhorn resizes online, no downtime.
-                  storage: 20Gi
+                  storage: 25Gi
         # Watch ServiceMonitors/PodMonitors/PrometheusRules/Probes cluster-wide,
         # not just ones labeled for this release.
         serviceMonitorSelectorNilUsesHelmValues: false
