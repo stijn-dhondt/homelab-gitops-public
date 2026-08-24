@@ -1,4 +1,4 @@
-# C-Level Summary: Homelab Platform Achievements
+# Summary: Lab Platform Achievements
 
 ## Executive overview
 
