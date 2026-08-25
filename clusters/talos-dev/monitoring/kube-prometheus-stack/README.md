@@ -132,4 +132,6 @@ storage: 20Gi  # bump this
 ```
 Push the change; Flux/Helm resizes the PVC in place. Worth revisiting if usage keeps climbing —
 `retention: 31d` means it grows continuously with scrape target count/cardinality, not something
-that plateaus on its own.
+that plateaus on its own. This isn't a one-off — Longhorn has no auto-grow feature at all, this
+volume will need manual growth again; see `storage/longhorn/README.md`'s "Longhorn doesn't
+auto-grow volumes" (issue #44) for why, and why no alert warns about it yet either.

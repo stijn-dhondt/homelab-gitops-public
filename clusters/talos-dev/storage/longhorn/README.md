@@ -54,6 +54,22 @@ shows up in Prometheus as a scrape timeout (`context deadline exceeded`), not a 
 namespace on TCP `9500`, rather than touching or disabling the chart-managed one — a future chart
 upgrade won't clobber it, and the internal restriction stays in effect for everyone else.
 
+## Longhorn doesn't auto-grow volumes (issue #44)
+
+`allowVolumeExpansion: true` only makes a **manual** size increase resize online/non-disruptively
+— nothing watches usage and grows a volume on its own. This isn't a Longhorn gap specifically,
+virtually no Kubernetes CSI driver does this; capacity planning is on the operator. Hit repeatedly
+with Prometheus's own storage (`monitoring/kube-prometheus-stack/helmrelease.yaml`) — `5Gi → 10Gi`
+on 2026-07-25, then `10Gi → 20Gi` on 2026-08-08, both caught by manually checking usage rather than
+any alert (see that README's "Grow Prometheus's storage" for the mechanism). Any volume with
+`retention`/data that grows unbounded over time (Prometheus, Loki, MariaDB) will need this again —
+don't assume a one-time fix.
+
+Worth noting: kube-prometheus-stack ships `KubePersistentVolumeFillingUp` by default, which should
+warn before a volume actually fills. It likely already fires — but Alertmanager's only configured
+receiver in this cluster is `"null"` (no Slack/email/webhook route in git), so every alert
+currently goes nowhere. That's a separate, cluster-wide alerting gap, not tracked here.
+
 ## The NAS backup share needs manual permissions (not in git)
 
 Longhorn's backup pods run as root; NFS `root_squash` (the default) maps root to an
