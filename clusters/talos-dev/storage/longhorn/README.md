@@ -68,7 +68,8 @@ don't assume a one-time fix.
 Worth noting: kube-prometheus-stack ships `KubePersistentVolumeFillingUp` by default, which should
 warn before a volume actually fills. It likely already fires — but Alertmanager's only configured
 receiver in this cluster is `"null"` (no Slack/email/webhook route in git), so every alert
-currently goes nowhere. That's a separate, cluster-wide alerting gap, not tracked here.
+currently goes nowhere. That's a separate, cluster-wide alerting gap — tracked in issue #45, not
+fixed here.
 
 ## The NAS backup share needs manual permissions (not in git)
 
