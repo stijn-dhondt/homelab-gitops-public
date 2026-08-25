@@ -11,3 +11,4 @@ resources:
   - recurringjob-trim.yaml
   - servicemonitor.yaml
   - grafana-dashboard-configmap.yaml
+  - networkpolicy-allow-prometheus.yaml

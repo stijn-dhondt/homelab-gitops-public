@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: longhorn-manager-allow-prometheus
+  namespace: longhorn-system
+spec:
+  podSelector:
+    matchLabels:
+      app: longhorn-manager
+  policyTypes:
+    - Ingress
+  ingress:
+    # The chart's own longhorn-manager NetworkPolicy (networkPolicies.restrictInternalTraffic,
+    # default true) only allows same-namespace Longhorn components, which silently blocks the
+    # Prometheus scrape from the monitoring namespace. NetworkPolicies for the same pod
+    # selector are additive, so this only adds an exception rather than touching that resource.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9500
