@@ -24,6 +24,7 @@ online/non-disruptive — every `apps/*/README.md`'s "grow the storage" section 
 | `authentik-auth-headers-configmap.yaml`, `authentik-outpost-service.yaml` | Forward-auth plumbing shared with every protected app. |
 | `servicemonitor.yaml` | Prometheus scrape config for Longhorn's own metrics. |
 | `grafana-dashboard-configmap.yaml` | Volume health/replica status/disk usage per PV — the dashboard Longhorn's own docs recommend ([grafana.com #17626](https://grafana.com/grafana/dashboards/17626)). Auto-loaded by Grafana's sidecar, see `monitoring/kube-prometheus-stack/README.md`. |
+| `networkpolicy-allow-prometheus.yaml` | Lets Prometheus (in `monitoring`) reach `longhorn-manager`'s metrics port — see below (issue #43). |
 
 ## Detached volumes need `allowRecurringJobWhileVolumeDetached`
 
@@ -35,6 +36,23 @@ that has already completed, like `cluster-backup-data` — see `backup/cluster-b
 `helmrelease.yaml` sets `allowRecurringJobWhileVolumeDetached: true` globally so any
 currently-detached volume gets attached just long enough for its scheduled job, then detached
 again.
+
+## The chart's default NetworkPolicy blocks Prometheus (issue #43)
+
+The Longhorn chart's `networkPolicies.restrictInternalTraffic` defaults to `true` — separate from,
+and independent of, `networkPolicies.enabled` (defaults `false`). Neither is set in
+`helmrelease.yaml`, so the chart's default silently applies: a `NetworkPolicy` named
+`longhorn-manager` that only allows ingress to `longhorn-manager` pods from other same-namespace
+Longhorn components. Prometheus lives in `monitoring`, so every scrape against port `9500` got
+dropped by Cilium — no error on the Longhorn side, volumes/replicas/UI all looked completely
+healthy, the only symptom was the Grafana dashboard going blank. A dropped `NetworkPolicy` packet
+shows up in Prometheus as a scrape timeout (`context deadline exceeded`), not a connection refusal
+— that's the tell that it's a policy, not the exporter itself.
+
+`networkpolicy-allow-prometheus.yaml` adds a separate, additive `NetworkPolicy` (Kubernetes
+`NetworkPolicy` objects for the same pod selector are OR'd together) allowing the `monitoring`
+namespace on TCP `9500`, rather than touching or disabling the chart-managed one — a future chart
+upgrade won't clobber it, and the internal restriction stays in effect for everyone else.
 
 ## The NAS backup share needs manual permissions (not in git)
 
