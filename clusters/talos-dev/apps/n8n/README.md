@@ -100,7 +100,7 @@ Push the change; Flux/Helm resizes the PVC in place.
 spec:
   chart:
     spec:
-      version: "2.0.1"  # bump to a newer chart version
+      version: "2.1.1"  # bump to a newer chart version
 ```
 Check the [chart's changelog](https://github.com/8gears/n8n-helm-chart/releases) first — this is a
 separate version from n8n itself (see below), and Renovate already opens a PR for this
@@ -111,7 +111,7 @@ automatically via the built-in `flux` manager.
 # helmrelease.yaml (under values:)
 image:
   # renovate: datasource=docker depName=n8nio/n8n versioning=semver-coerced
-  tag: "2.35.0"
+  tag: "2.37.6"
 ```
 Renovate opens a PR for this one too — see [Keeping n8n up to date](#keeping-n8n-up-to-date) above for why it needs its own tracking.
 

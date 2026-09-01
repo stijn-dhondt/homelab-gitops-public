@@ -86,7 +86,7 @@ Push the change; Flux/Helm resizes the PVCs in place.
 spec:
   chart:
     spec:
-      version: "33.0.4"  # bump to a newer chart version
+      version: "33.0.9"  # bump to a newer chart version
 ```
 Check the [chart's changelog](https://github.com/bitnami/charts/tree/main/bitnami/wordpress) before bumping — a chart version bump can pull in a newer WordPress (and MariaDB) release too.
 

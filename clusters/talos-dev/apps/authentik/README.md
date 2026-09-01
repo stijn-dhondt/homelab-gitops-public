@@ -324,7 +324,7 @@ entry needed.
 spec:
   chart:
     spec:
-      version: "2026.5.6"  # bump to a newer chart version
+      version: "2026.8.0"  # bump to a newer chart version
 ```
 
 **Back up Authentik's config:** the Postgres PVC contains everything — users, groups, flows,
