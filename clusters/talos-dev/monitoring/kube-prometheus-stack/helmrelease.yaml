@@ -37,7 +37,13 @@ spec:
                   # (3.67Gi/5Gi) and climbing, with 31d retention and scrape targets
                   # added over time (cert-manager, ingress-nginx, Cilium, Longhorn,
                   # MariaDB). Longhorn resizes online, no downtime.
-                  storage: 20Gi
+                  #
+                  # Grown again to 35Gi on 2026-09-11 (applied live via kubectl patch,
+                  # backfilled here) - TSDB block bytes were climbing ~336MB/day
+                  # (~10GB/month) as more scrape targets got added, and 20Gi was
+                  # within days of filling up. At 35Gi, current usage is ~21.6GB
+                  # (~59%), giving ~45 days of headroom at the same growth rate.
+                  storage: 35Gi
         # Watch ServiceMonitors/PodMonitors/PrometheusRules/Probes cluster-wide,
         # not just ones labeled for this release.
         serviceMonitorSelectorNilUsesHelmValues: false
@@ -87,6 +93,67 @@ spec:
               resources:
                 requests:
                   storage: 1Gi
+        # Mounted at /etc/alertmanager/secrets/alertmanager-smtp-credentials/password -
+        # referenced below as smtp_auth_password_file so the password never appears
+        # in the rendered alertmanager.yaml or this HelmRelease.
+        secrets:
+          - alertmanager-smtp-credentials
+
+      # Previously every route pointed at the built-in "null" receiver, so the
+      # default KubePersistentVolumeFillingUp/Watchdog/etc. alerts fired but were
+      # never delivered anywhere - see the 2026-09-11 Prometheus storage incident.
+      # This wires up real email delivery via iCloud's SMTP relay.
+      config:
+        global:
+          resolve_timeout: 5m
+          smtp_smarthost: "smtp.mail.me.com:587"
+          smtp_from: "no-reply@example.com"
+          smtp_auth_username: "stijn@example.com"
+          smtp_auth_password_file: /etc/alertmanager/secrets/alertmanager-smtp-credentials/password
+          smtp_require_tls: true
+        inhibit_rules:
+          - source_matchers:
+              - "severity = critical"
+            target_matchers:
+              - "severity =~ warning|info"
+            equal:
+              - "namespace"
+              - "alertname"
+          - source_matchers:
+              - "severity = warning"
+            target_matchers:
+              - "severity = info"
+            equal:
+              - "namespace"
+              - "alertname"
+          - source_matchers:
+              - "alertname = InfoInhibitor"
+            target_matchers:
+              - "severity = info"
+            equal:
+              - "namespace"
+          - target_matchers:
+              - "alertname = InfoInhibitor"
+        route:
+          group_by: ["namespace"]
+          group_wait: 30s
+          group_interval: 5m
+          repeat_interval: 12h
+          receiver: "email"
+          routes:
+            # Watchdog is a permanently-firing dead-man's-switch alert (confirms the
+            # alerting pipeline itself is alive), not something to be emailed about.
+            - receiver: "null"
+              matchers:
+                - alertname = "Watchdog"
+        receivers:
+          - name: "null"
+          - name: "email"
+            email_configs:
+              - to: "stijn@example.com"
+                send_resolved: true
+        templates:
+          - "/etc/alertmanager/config/*.tmpl"
       ingress:
         enabled: true
         ingressClassName: nginx
