@@ -153,6 +153,21 @@ curl -X POST http://localhost:9093/api/v2/alerts -H "Content-Type: application/j
   "startsAt": "'"$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"'"
 }]'
 ```
+Note: after editing `alertmanager.config`, the running pod picks it up via the `config-reloader`
+sidecar watching the mounted secret, but that only happens once kubelet syncs the updated Secret
+volume into the pod — allow ~1-2 minutes after the HelmRelease reconciles before assuming a config
+change didn't take effect. Confirm with
+`kubectl logs -n monitoring alertmanager-kube-prometheus-stack-alertmanager-0 -c config-reloader --tail=5`
+(look for a fresh `"Reload triggered"` line) before re-testing.
+
+**Alertmanager email landed in Junk the first time** — auth succeeded (no more `535` errors in the
+`alertmanager` container logs) but Apple Mail still junked it. Cause: `smtp_from` was
+`no-reply@example.com` while `smtp_auth_username` was `stijn@tine-stijn.be` — sending "as" a domain
+that has no SPF/DKIM/DMARC record authorizing iCloud's relay looks exactly like spoofing to any
+receiving mail server. Fixed by making `smtp_from` match the authenticated domain
+(`tine-stijn.be`), which is the one Apple's iCloud custom-domain setup actually has DNS records
+for. If it still lands in Junk after this, the fix is on the Apple Mail side (mark the message "Not
+Junk" once) rather than the cluster config — this was the domain-alignment part of the problem.
 `group_wait` is 30s, so give it that long before checking
 `kubectl logs -n monitoring alertmanager-kube-prometheus-stack-alertmanager-0 -c alertmanager` for
 the delivery attempt.
