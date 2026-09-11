@@ -125,14 +125,34 @@ kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~"prometheus-.*"}
 
 **Grow Prometheus's storage** (Longhorn's `allowVolumeExpansion` is enabled, so this is
 online/non-disruptive) — grown from 5Gi to 10Gi on 2026-07-25, then 10Gi to 20Gi on 2026-08-08,
-both times after kubelet reported usage climbing past ~70%:
+then 20Gi to 35Gi on 2026-09-11 (this last bump was applied live via `kubectl patch pvc` first,
+then backfilled into git — see the `helmrelease.yaml` comment for the usage numbers behind it):
 ```yaml
 # helmrelease.yaml, under prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests
-storage: 20Gi  # bump this
+storage: 35Gi  # bump this
 ```
-Push the change; Flux/Helm resizes the PVC in place. Worth revisiting if usage keeps climbing —
-`retention: 31d` means it grows continuously with scrape target count/cardinality, not something
-that plateaus on its own. This isn't a one-off — Longhorn has no auto-grow feature at all, this
-volume will need manual growth again; see `storage/longhorn/README.md`'s "Longhorn doesn't
-auto-grow volumes" (issue #44) for why, and why no alert warns about it yet either (issue #45 —
-Alertmanager's only receiver is `"null"`).
+Push the change; Flux/Helm resizes the PVC in place — but if you resize the live PVC directly
+first (e.g. to unblock an active incident before a PR lands), remember to commit the same value
+here afterward, or the next person reading this file will see a stale number. Worth revisiting if
+usage keeps climbing — `retention: 31d` means it grows continuously with scrape target
+count/cardinality, not something that plateaus on its own. This isn't a one-off — Longhorn has no
+auto-grow feature at all, this volume will need manual growth again; see
+`storage/longhorn/README.md`'s "Longhorn doesn't auto-grow volumes" (issue #44) for why.
+
+**Check whether an alert will actually reach anyone** — as of 2026-09-11 (issue #45, closed)
+Alertmanager sends real email via `alertmanager.config.global` (iCloud SMTP, password mounted from
+the `alertmanager-smtp-credentials` SealedSecret, referenced as `smtp_auth_password_file` so it
+never appears in the rendered config). Every route defaults to the `email` receiver except
+`Watchdog` (the permanently-firing dead-man's-switch, deliberately muted to `"null"`). To send a
+manual test alert without waiting for a real one to fire:
+```bash
+kubectl port-forward -n monitoring svc/kube-prometheus-stack-alertmanager 9093:9093 &
+curl -X POST http://localhost:9093/api/v2/alerts -H "Content-Type: application/json" -d '[{
+  "labels": {"alertname": "Test", "severity": "warning", "namespace": "monitoring"},
+  "annotations": {"summary": "manual test"},
+  "startsAt": "'"$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"'"
+}]'
+```
+`group_wait` is 30s, so give it that long before checking
+`kubectl logs -n monitoring alertmanager-kube-prometheus-stack-alertmanager-0 -c alertmanager` for
+the delivery attempt.
