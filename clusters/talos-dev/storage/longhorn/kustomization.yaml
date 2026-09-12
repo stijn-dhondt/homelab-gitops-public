@@ -4,6 +4,7 @@ resources:
   - namespace.yaml
   - helmrepository.yaml
   - helmrelease.yaml
+  - single-replica-storageclass.yaml
   - authentik-auth-headers-configmap.yaml
   - authentik-outpost-service.yaml
   - ingress.yaml

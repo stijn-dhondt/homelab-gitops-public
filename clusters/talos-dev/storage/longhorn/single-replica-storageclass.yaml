@@ -1,0 +1,25 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-single-replica
+  # Not a Helm-templated class (unlike the chart's own "longhorn" default) - a plain
+  # StorageClass pointing at the same CSI provisioner, for volumes where losing a node
+  # means losing the volume is an accepted tradeoff (e.g. Prometheus TSDB, backed up
+  # nightly to the NAS - see clusters/talos-dev/monitoring/kube-prometheus-stack).
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+parameters:
+  numberOfReplicas: "1"
+  # Keeps the single replica local to whichever node the workload pod is scheduled on -
+  # otherwise every read/write crosses the network to wherever Longhorn happened to place
+  # the one replica. Longhorn rebuilds the replica locally if the pod moves node.
+  dataLocality: "strict-local"
+  staleReplicaTimeout: "30"
+  fromBackup: ""
+  fsType: "ext4"
+  unmapMarkSnapChainRemoved: "ignored"
+  disableRevisionCounter: "true"
+  dataEngine: "v1"
+  backupTargetName: "default"

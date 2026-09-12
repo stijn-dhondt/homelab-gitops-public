@@ -29,7 +29,17 @@ spec:
         storageSpec:
           volumeClaimTemplate:
             spec:
-              storageClassName: longhorn
+              # Single-replica on purpose (2026-09-12) - Prometheus's TSDB is backed up
+              # nightly to the NAS (see storage/longhorn/recurringjob-nightly.yaml), so
+              # losing a node here means losing at most a day of metrics, which is an
+              # accepted tradeoff for not tripling the disk footprint of the largest
+              # volume in the cluster. See storage/longhorn/single-replica-storageclass.yaml.
+              #
+              # Only takes effect if this PVC is ever deleted and recreated - Kubernetes
+              # won't let you change storageClassName on an already-bound PVC, so the
+              # existing volume was migrated live via a Longhorn Volume CR patch instead
+              # (numberOfReplicas 3->1, dataLocality disabled->strict-local).
+              storageClassName: longhorn-single-replica
               accessModes: ["ReadWriteOnce"]
               resources:
                 requests:
