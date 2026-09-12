@@ -63,6 +63,17 @@ spec:
         extraArgs:
           primary:
             - --collect.info_schema.processlist
+        # Default 150m CPU limit was firing CPUThrottlingHigh (info) at 30-50%
+        # throttled periods despite ~5m average usage - the exporter's scrape
+        # bursts blow through the tiny 15ms/100ms CFS quota even though it barely
+        # uses any CPU on average. Bumped to see if this was just too tight.
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 300m
+            memory: 192Mi
         serviceMonitor:
           enabled: true
           selector:
