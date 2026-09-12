@@ -12,10 +12,12 @@ reclaimPolicy: Delete
 volumeBindingMode: Immediate
 parameters:
   numberOfReplicas: "1"
-  # Keeps the single replica local to whichever node the workload pod is scheduled on -
-  # otherwise every read/write crosses the network to wherever Longhorn happened to place
-  # the one replica. Longhorn rebuilds the replica locally if the pod moves node.
-  dataLocality: "strict-local"
+  # best-effort (not strict-local!) - tried strict-local live on 2026-09-12 and it caused
+  # an outage: it HARD-REQUIRES the replica and the attaching node to match, and refuses to
+  # attach otherwise instead of relocating the replica, so a pod rescheduled to a different
+  # node than its existing replica just fails to start. best-effort still prefers a local
+  # replica (avoiding the network hop) but falls back to remote instead of blocking attach.
+  dataLocality: "best-effort"
   staleReplicaTimeout: "30"
   fromBackup: ""
   fsType: "ext4"
