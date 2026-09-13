@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: wordpress-mariadb-allow-prometheus
+  namespace: wordpress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: wordpress
+      app.kubernetes.io/name: mariadb
+  policyTypes:
+    - Ingress
+  ingress:
+    # The mariadb subchart's own NetworkPolicy only allows same-namespace pods (the
+    # mariadb pod itself, wordpress-mariadb-client-labeled pods, and the wordpress app
+    # pod) on port 9104, silently blocking the Prometheus scrape from the monitoring
+    # namespace - same gotcha as storage/longhorn/networkpolicy-allow-prometheus.yaml.
+    # NetworkPolicies for the same pod selector are additive, so this only adds an
+    # exception rather than touching that chart-managed resource. Went unnoticed for a
+    # week (stale connection state survived until the pod was recreated on 2026-09-12
+    # for the metrics CPU limit bump), which is when TargetDown started firing.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9104

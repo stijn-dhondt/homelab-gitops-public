@@ -10,3 +10,4 @@ resources:
   - grafana-dashboard-configmap.yaml
   - wordpress-security-headers-configmap.yaml
   - mariadb-mcp-loadbalancer.yaml
+  - networkpolicy-allow-prometheus.yaml
