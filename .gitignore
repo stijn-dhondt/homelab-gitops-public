@@ -1,3 +1,12 @@
 .DS_Store
 sealed-secrets-key-backup.yaml
 .claude/settings.local.json
+
+# Talos / Kubernetes client credentials and generated machine configs - see docs/workstation-access.md
+talosconfig
+*talosconfig*.yaml
+clusters/talos-dev/talos/config/config.yaml
+controlplane.yaml
+worker.yaml
+secrets.yaml
+kubeconfig
