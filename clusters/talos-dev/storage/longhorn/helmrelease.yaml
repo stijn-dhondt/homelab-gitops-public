@@ -29,7 +29,11 @@ spec:
       # 01:00 CronJob run and the 02:00 nightly-backup RecurringJob) sits detached, and the
       # RecurringJob silently skips it instead of attaching it to back it up. See issue #15.
       allowRecurringJobWhileVolumeDetached: true
-    defaultBackupStore: 
+      # Default 0 leaves every volume on the old engine after a Longhorn upgrade until each one
+      # is upgraded by hand (1.12.0 -> 1.13.0 sat like that until 2026-10-21). 1 = Longhorn live-
+      # upgrades volume engines itself, one at a time per node, right after the manager upgrade.
+      concurrentAutomaticEngineUpgradePerNodeLimit: 1
+    defaultBackupStore:
       backupTarget: "nfs://10.0.50.100:/Longhorn"
       backupTargetCredentialSecret: ""
       pollInterval: 300  
