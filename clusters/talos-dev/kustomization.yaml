@@ -5,6 +5,9 @@ kind: Kustomization
 # needs to wait on CRDs existing first becomes its own separate Flux Kustomization instead
 # (see networking/cert-manager-issuers-kustomization.yaml).
 resources:
+  # Flux's own controllers + sync config, so merging a gotk-components.yaml bump
+  # (e.g. from Renovate) actually upgrades Flux instead of only changing git.
+  - flux-system
   # networking
   - networking/cilium
   - networking/ingress-nginx
