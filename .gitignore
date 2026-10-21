@@ -1,2 +1,3 @@
 .DS_Store
 sealed-secrets-key-backup.yaml
+.claude/settings.local.json
