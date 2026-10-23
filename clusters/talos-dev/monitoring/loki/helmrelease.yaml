@@ -84,7 +84,7 @@ spec:
     bloomGateway:
       replicas: 0
 
-    # No path-based routing needed with a single binary and a single client (Promtail/Grafana).
+    # No path-based routing needed with a single binary and a single client (Alloy/Grafana).
     gateway:
       enabled: false
 

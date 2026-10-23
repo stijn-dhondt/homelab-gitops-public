@@ -29,6 +29,6 @@ resources:
   - monitoring/kube-prometheus-stack
   - monitoring/metrics-server
   - monitoring/loki
-  - monitoring/promtail
+  - monitoring/alloy
   # backup
   - backup/cluster-backup

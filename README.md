@@ -62,6 +62,7 @@ folder, and cross-cutting topics (hardware, network, the bootstrap runbook) unde
 - [storage/democratic-csi/](clusters/talos-dev/storage/democratic-csi/README.md) — ZFS-over-NFS, the default StorageClass
 - [storage/longhorn/](clusters/talos-dev/storage/longhorn/README.md) — replicated local block storage
 - [security/sealed-secrets/](clusters/talos-dev/security/sealed-secrets/README.md) — how every `*-sealed.yaml` in this repo works
+- [monitoring/alloy/](clusters/talos-dev/monitoring/alloy/README.md) — pod log collection into Loki (replaced Promtail)
 
 **Apps** (`clusters/talos-dev/apps/`) — see
 [clusters/talos-dev/apps/README.md](clusters/talos-dev/apps/README.md) for the full index and the
