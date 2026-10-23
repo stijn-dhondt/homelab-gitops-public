@@ -8,6 +8,9 @@
       "/(?:^|/)helmrepository\\.ya?ml$/"
     ]
   },
+  "kubernetes": {
+    "managerFilePatterns": ["/^clusters/.+\\.ya?ml$/"]
+  },
   "customManagers": [
     {
       "customType": "regex",
