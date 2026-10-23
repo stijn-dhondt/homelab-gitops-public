@@ -58,16 +58,33 @@ zfs:
   datasetPermissionsUser: 0
   datasetPermissionsGroup: 0
 nfs:
+  shareStrategy: "setDatasetProperties"
+  shareStrategySetDatasetProperties:
+    properties:
+      sharenfs: "rw=@10.0.20.0/24,no_root_squash"
   shareHost: "10.0.50.100"
-  shareAlldirs: false
-  shareAllowedHosts: []
-  shareAllowedNetworks: []
-  shareOptions: ""
 ' \
   --dry-run=client -o yaml | \
 kubeseal --controller-namespace sealed-secrets --controller-name sealed-secrets-controller --format yaml \
   > clusters/talos-dev/storage/democratic-csi/driver-config-sealed.yaml
 ```
+
+After Flux applies the new `SealedSecret`, restart the controller once — democratic-csi only reads
+its config at startup:
+```bash
+kubectl -n democratic-csi rollout restart deployment democratic-csi-controller
+```
+
+> **Gotcha:** `zfs-generic-nfs` shares each dataset by setting its ZFS `sharenfs` property, so the
+> `nfs:` block needs `shareStrategy: setDatasetProperties` **and** the
+> `shareStrategySetDatasetProperties.properties` map. Without that map every `CreateVolume` fails
+> with `TypeError: Cannot read properties of undefined (reading 'properties')` and the PVC stays
+> `Pending` — found 2026-10-23 on the first real `zfs-nfs` PVC; until then no volume in the cluster
+> had used this class. The older `shareAlldirs`/`shareAllowedHosts`/`shareOptions` keys belong to
+> the FreeNAS/TrueNAS drivers and are ignored here. `rw=@10.0.20.0/24` limits the export to the
+> cluster VLAN; `no_root_squash` is needed because kubelet runs as root when it applies a pod's
+> `fsGroup` (e.g. Prometheus's) to the volume. A failed attempt can leave its dataset behind on
+> the NAS (`Talos/k8s/pvc-<uid>`) — remove it there with `zfs destroy`.
 
 ## Common tasks
 
