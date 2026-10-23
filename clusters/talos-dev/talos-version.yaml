@@ -12,4 +12,4 @@
 # lines in between (blank lines are fine) - the customManager regex in renovate.json
 # requires them adjacent to match.
 # renovate: datasource=github-releases depName=siderolabs/talos
-talosVersion: v1.13.6
+talosVersion: v1.14.4
