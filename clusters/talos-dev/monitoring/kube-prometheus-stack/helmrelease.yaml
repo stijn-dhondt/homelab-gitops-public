@@ -43,7 +43,8 @@ spec:
               # Only takes effect if this PVC is ever deleted and recreated - Kubernetes
               # won't let you change storageClassName on an already-bound PVC, so the
               # existing volume was migrated live via a Longhorn Volume CR patch instead
-              # (numberOfReplicas 3->1, dataLocality disabled->strict-local).
+              # (numberOfReplicas 3->1, dataLocality disabled->best-effort; strict-local
+              # was tried first and caused an outage, see the StorageClass comments).
               #
               # Same for unmapMarkSnapChainRemoved=enabled (patched live 2026-10-23): the
               # nightly backup's snapshot kept every block the TSDB ever deleted (39.8GB on

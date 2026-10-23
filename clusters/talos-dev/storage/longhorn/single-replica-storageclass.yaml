@@ -21,6 +21,11 @@ parameters:
   staleReplicaTimeout: "30"
   fromBackup: ""
   fsType: "ext4"
+  # "ignored" = follow the global remove-snapshots-during-filesystem-trim setting (false).
+  # The Prometheus volume overrides this per volume (enabled, patched live 2026-10-23) -
+  # see storage/longhorn/README.md "Backup snapshots keep deleted blocks". Left as-is here
+  # because StorageClass parameters are immutable: changing them would make Flux fail to
+  # apply this object until it's deleted and recreated.
   unmapMarkSnapChainRemoved: "ignored"
   disableRevisionCounter: "true"
   dataEngine: "v1"

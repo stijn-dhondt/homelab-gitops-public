@@ -133,11 +133,18 @@ storage: 35Gi  # bump this
 ```
 Push the change; Flux/Helm resizes the PVC in place — but if you resize the live PVC directly
 first (e.g. to unblock an active incident before a PR lands), remember to commit the same value
-here afterward, or the next person reading this file will see a stale number. Worth revisiting if
-usage keeps climbing — `retention: 31d` means it grows continuously with scrape target
-count/cardinality, not something that plateaus on its own. This isn't a one-off — Longhorn has no
-auto-grow feature at all, this volume will need manual growth again; see
-`storage/longhorn/README.md`'s "Longhorn doesn't auto-grow volumes" (issue #44) for why.
+here afterward, or the next person reading this file will see a stale number. Since 2026-10-23
+usage is capped: `retentionSize: 25GB` sits next to `retention: 31d`, and whichever limit is hit
+first wins. So adding scrape targets now shortens how far back metrics go instead of filling the
+volume. If 31 days of history matters more than disk, raise both `retentionSize` and `storage`
+together, keeping `retentionSize` well under the PVC size (it counts blocks + WAL, not filesystem
+overhead). Longhorn has no auto-grow feature at all; see `storage/longhorn/README.md`'s "Longhorn
+doesn't auto-grow volumes" (issue #44).
+
+**Check Prometheus's footprint on the node, not just in the volume** — kubelet's numbers above show
+what's inside the filesystem; Longhorn's `actualSize` shows what the volume takes on disk, which
+was nearly double (39.8GB vs ~23GB) until the nightly trim was allowed to remove the backup
+snapshot. See `storage/longhorn/README.md`'s "Backup snapshots keep deleted blocks".
 
 **Check whether an alert will actually reach anyone** — as of 2026-09-11 (issue #45, closed)
 Alertmanager sends real email via `alertmanager.config.global` (iCloud SMTP, password mounted from

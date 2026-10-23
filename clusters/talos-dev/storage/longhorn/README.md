@@ -19,7 +19,7 @@ online/non-disruptive — every `apps/*/README.md`'s "grow the storage" section 
 | `helmrepository.yaml` | The `longhorn` chart from `https://charts.longhorn.io`. |
 | `helmrelease.yaml` | Data path, replica auto-balancing, the NFS backup target, `allowRecurringJobWhileVolumeDetached` (see below), and the deliberate `persistence.defaultClass: false` (see above). |
 | `recurringjob-nightly.yaml` | A `RecurringJob` — nightly backup at 02:00, 14 days retention, 2 concurrent. Applies to volumes in the `default` group (Longhorn's implicit group every volume belongs to unless configured otherwise). |
-| `recurringjob-trim.yaml` | A `RecurringJob` — nightly filesystem trim at 03:00 (after the backup), 2 concurrent. Same `default` group as the backup job. |
+| `recurringjob-trim.yaml` | A `RecurringJob` — nightly filesystem trim at 03:00 (after the backup), 2 concurrent. Same `default` group as the backup job. Can't reclaim space held by the backup's snapshot unless the volume allows it — see "Backup snapshots keep deleted blocks" below. |
 | `ingress.yaml` | Longhorn's own UI, at `longhorn.lab.example.com` — forward-auth annotations, see the authentik README's "How apps get protected". |
 | `authentik-auth-headers-configmap.yaml`, `authentik-outpost-service.yaml` | Forward-auth plumbing shared with every protected app. |
 | `servicemonitor.yaml` | Prometheus scrape config for Longhorn's own metrics. |
@@ -36,6 +36,36 @@ that has already completed, like `cluster-backup-data` — see `backup/cluster-b
 `helmrelease.yaml` sets `allowRecurringJobWhileVolumeDetached: true` globally so any
 currently-detached volume gets attached just long enough for its scheduled job, then detached
 again.
+
+## Backup snapshots keep deleted blocks
+
+Every `nightly-backup` run takes a Longhorn snapshot first and keeps it on the volume as the base
+for the next incremental backup; each night's snapshot is merged into the previous one. Longhorn
+works on blocks, not files, so that snapshot holds on to every block the filesystem has ever
+written, including ones whose files were since deleted. `nightly-trim` only punches holes in the
+part written after the snapshot: with the global `remove-snapshots-during-filesystem-trim: false`
+it may not touch snapshots.
+
+For most volumes this barely matters. For a write-heavy volume that constantly rewrites and deletes
+its own files it does: Prometheus's TSDB compaction touches nearly every block, so on 2026-10-23
+its 35Gi volume used **39.8GB on disk for ~23GB of actual data** (one 37GB snapshot plus the newest
+writes). Compare Longhorn's `status.actualSize` against kubelet's
+`kubelet_volume_stats_used_bytes` to spot this:
+```bash
+kubectl -n longhorn-system get volumes.longhorn.io <pv-name> -o jsonpath='{.status.actualSize}'
+```
+
+Fix, applied live to the Prometheus volume only (`pvc-bc0f8e6a-…`), not in git — Longhorn creates
+`Volume` objects itself, Flux doesn't manage them:
+```bash
+kubectl -n longhorn-system patch volumes.longhorn.io <pv-name> --type merge \
+  -p '{"spec":{"unmapMarkSnapChainRemoved":"enabled"}}'
+```
+The 03:00 trim then removes the snapshot and hands the freed blocks back. Tradeoff: with its base
+snapshot gone, the next backup has to read the whole volume instead of only changed blocks. Not set
+globally or on `longhorn-single-replica`, so volumes where this doesn't pay off keep cheap
+incremental backups (and StorageClass parameters are immutable anyway). If the Prometheus PVC is
+ever recreated, patch the new volume again.
 
 ## The chart's default NetworkPolicy blocks Prometheus (issue #43)
 
