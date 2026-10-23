@@ -43,7 +43,7 @@ spec:
               # image with no shell at all (confirmed live: "sh": executable file not
               # found) - can't redirect `kubectl get ... -o yaml` output to a file without
               # one. alpine/k8s bundles a real Alpine userland alongside kubectl.
-              image: alpine/k8s:1.36.0
+              image: alpine/k8s:1.37.1
               command:
                 - sh
                 - -c
