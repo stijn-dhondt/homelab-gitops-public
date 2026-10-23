@@ -45,6 +45,11 @@ spec:
               # existing volume was migrated live via a Longhorn Volume CR patch instead
               # (numberOfReplicas 3->1, dataLocality disabled->best-effort; strict-local
               # was tried first and caused an outage, see the StorageClass comments).
+              # dataLocality was set back to disabled on 2026-10-23 (also live): after the
+              # pod moved to cp-03, best-effort kept trying to add a local replica there,
+              # which failed as "Local Replica Scheduling Failure: insufficient storage"
+              # because Longhorn reserves the full 35Gi per replica. The single replica now
+              # stays where it is and the pod reads it over the network from any node.
               #
               # Same for unmapMarkSnapChainRemoved=enabled (patched live 2026-10-23): the
               # nightly backup's snapshot kept every block the TSDB ever deleted (39.8GB on

@@ -17,6 +17,12 @@ parameters:
   # attach otherwise instead of relocating the replica, so a pod rescheduled to a different
   # node than its existing replica just fails to start. best-effort still prefers a local
   # replica (avoiding the network hop) but falls back to remote instead of blocking attach.
+  #
+  # Caveat: best-effort tries to build that local replica whenever the pod lands on a node
+  # without one, and needs room for the volume's full size there. The Prometheus volume hit
+  # this on 2026-10-23 (Local Replica Scheduling Failure: insufficient storage) and was
+  # patched live to dataLocality=disabled. Left as best-effort here because StorageClass
+  # parameters are immutable; patch the Volume CR again if that PVC is ever recreated.
   dataLocality: "best-effort"
   staleReplicaTimeout: "30"
   fromBackup: ""
