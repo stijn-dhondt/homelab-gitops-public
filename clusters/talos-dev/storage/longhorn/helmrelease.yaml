@@ -38,7 +38,9 @@ spec:
       backupTargetCredentialSecret: ""
       pollInterval: 300  
     persistence:
-      defaultClass: false   # keep democratic-csi as default; set true if you want Longhorn default instead
+      # The cluster's only storage backend since democratic-csi (zfs-nfs) was removed on
+      # 2026-10-23, so a PVC without a storageClassName lands here instead of staying Pending.
+      defaultClass: true
     csi:
       attacherReplicaCount: 3
       provisionerReplicaCount: 3

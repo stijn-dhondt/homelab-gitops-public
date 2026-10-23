@@ -26,8 +26,9 @@ folder, and cross-cutting topics (hardware, network, the bootstrap runbook) unde
 - **Cilium** — CNI, kube-proxy replacement, LoadBalancer IPAM, and Hubble observability. See
   [clusters/talos-dev/networking/cilium/README.md](clusters/talos-dev/networking/cilium/README.md).
 - **Flux** — reconciles everything under `clusters/talos-dev/` on every push to `prod`.
-- **Two storage backends** — `zfs-nfs` (democratic-csi, the cluster default) and `longhorn` (local
-  block storage with replication), used per-app depending on what fits better.
+- **Longhorn** — the only storage backend: replicated block storage on each node's local disk, and
+  the default `StorageClass`. Backups go to an NFS share on the NAS. See
+  [clusters/talos-dev/storage/longhorn/README.md](clusters/talos-dev/storage/longhorn/README.md).
 - **Authentik** — SSO in front of every internal admin UI (Grafana, Prometheus, Alertmanager, n8n,
   Longhorn UI, Hubble UI), each gated by its own group, sharing one login. See
   [clusters/talos-dev/apps/authentik/README.md](clusters/talos-dev/apps/authentik/README.md).
@@ -59,8 +60,7 @@ folder, and cross-cutting topics (hardware, network, the bootstrap runbook) unde
 - [networking/ingress-nginx/](clusters/talos-dev/networking/ingress-nginx/README.md) — the ingress controller
 - [networking/cert-manager/](clusters/talos-dev/networking/cert-manager/README.md) — Let's Encrypt via Cloudflare DNS-01
 - [networking/cloudflare-tunnel/](clusters/talos-dev/networking/cloudflare-tunnel/README.md) — the only public entry point
-- [storage/democratic-csi/](clusters/talos-dev/storage/democratic-csi/README.md) — ZFS-over-NFS, the default StorageClass
-- [storage/longhorn/](clusters/talos-dev/storage/longhorn/README.md) — replicated local block storage
+- [storage/longhorn/](clusters/talos-dev/storage/longhorn/README.md) — replicated local block storage, the default StorageClass
 - [security/sealed-secrets/](clusters/talos-dev/security/sealed-secrets/README.md) — how every `*-sealed.yaml` in this repo works
 - [monitoring/kube-prometheus-stack/](clusters/talos-dev/monitoring/kube-prometheus-stack/README.md) — Prometheus, Grafana, Alertmanager; adding dashboards
 - [monitoring/alloy/](clusters/talos-dev/monitoring/alloy/README.md) — pod log collection into Loki (replaced Promtail)

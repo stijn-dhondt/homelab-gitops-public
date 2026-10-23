@@ -44,7 +44,7 @@ curl -fsSLo kubectl "https://dl.k8s.io/release/$V/bin/darwin/arm64/kubectl"
 echo "$(curl -fsSL "https://dl.k8s.io/release/$V/bin/darwin/arm64/kubectl.sha256")  kubectl" | shasum -a 256 -c
 
 # talosctl - must match talosVersion in clusters/talos-dev/talos-version.yaml
-T=v1.13.6
+T=v1.14.4
 curl -fsSLo talosctl-darwin-arm64 "https://github.com/siderolabs/talos/releases/download/$T/talosctl-darwin-arm64"
 curl -fsSL "https://github.com/siderolabs/talos/releases/download/$T/sha256sum.txt" | grep ' talosctl-darwin-arm64$' | shasum -a 256 -c
 mv talosctl-darwin-arm64 talosctl
@@ -75,7 +75,7 @@ $want = (Get-Content "$env:TEMP\kubectl.sha256" -Raw).Trim()
 if ((Get-FileHash "$bin\kubectl.exe" -Algorithm SHA256).Hash -ne $want) { Remove-Item "$bin\kubectl.exe"; throw 'kubectl checksum mismatch' }
 
 # talosctl - must match talosVersion in clusters/talos-dev/talos-version.yaml
-$T = 'v1.13.6'
+$T = 'v1.14.4'
 $asset = "talosctl-windows-$arch.exe"
 Invoke-WebRequest "https://github.com/siderolabs/talos/releases/download/$T/$asset" -OutFile "$bin\talosctl.exe"
 Invoke-WebRequest "https://github.com/siderolabs/talos/releases/download/$T/sha256sum.txt" -OutFile "$env:TEMP\talos-sha256sum.txt"

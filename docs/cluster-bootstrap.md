@@ -60,8 +60,8 @@ one is and why. For a from-scratch rebuild, reuse them as-is rather than recreat
 ```bash
 talosctl gen config my-cluster https://10.0.20.10:6443 \
   --config-patch @clusters/talos-dev/talos/config/cni-patch.yaml \
-  --talos-version v1.13.6 \
-  --install-image factory.talos.dev/installer/<schematic-id>:v1.13.6 \
+  --talos-version v1.14.4 \
+  --install-image factory.talos.dev/installer/<schematic-id>:v1.14.4 \
   --force
 ```
 

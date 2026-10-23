@@ -1,10 +1,13 @@
 # Longhorn
 
-Distributed block storage backed by local disk on each node — the `longhorn` `StorageClass` every
-app in this repo uses when it explicitly asks for it (n8n, WordPress, Authentik's Postgres,
-Grafana/Prometheus/Alertmanager). **Not** the cluster's default
-`StorageClass` — that's `zfs-nfs` via democratic-csi (see `storage/democratic-csi/README.md`);
-Longhorn is used where local block storage makes more sense than NFS.
+Distributed block storage backed by local disk on each node — the cluster's only storage backend
+and its default `StorageClass` (`persistence.defaultClass: true`). Every app in this repo (n8n,
+WordPress, Authentik's Postgres, Forgejo, Grafana/Prometheus/Alertmanager/Loki) still names
+`longhorn` or `longhorn-single-replica` explicitly.
+
+Until 2026-10-23 the default was `zfs-nfs`, from democratic-csi (ZFS datasets on the NAS over NFS).
+No volume ever used it, and it couldn't provision because of a broken driver config, so it was
+removed along with its NAS dataset. It's still in git history if NAS-backed volumes are wanted again.
 
 Each Longhorn volume keeps 3 replicas across nodes (`replicaAutoBalance: best-effort`) — each of
 the 4 nodes has roughly 90-100GB of local disk available for this, so even several apps each with
@@ -17,7 +20,7 @@ online/non-disruptive — every `apps/*/README.md`'s "grow the storage" section 
 |------|---------|
 | `namespace.yaml` | Creates the `longhorn-system` namespace. |
 | `helmrepository.yaml` | The `longhorn` chart from `https://charts.longhorn.io`. |
-| `helmrelease.yaml` | Data path, replica auto-balancing, the NFS backup target, `allowRecurringJobWhileVolumeDetached` (see below), and the deliberate `persistence.defaultClass: false` (see above). |
+| `helmrelease.yaml` | Data path, replica auto-balancing, the NFS backup target, `allowRecurringJobWhileVolumeDetached` (see below), and `persistence.defaultClass: true` (see above). |
 | `recurringjob-nightly.yaml` | A `RecurringJob` — nightly backup at 02:00, 14 days retention, 2 concurrent. Applies to volumes in the `default` group (Longhorn's implicit group every volume belongs to unless configured otherwise). |
 | `recurringjob-trim.yaml` | A `RecurringJob` — nightly filesystem trim at 03:00 (after the backup), 2 concurrent. Same `default` group as the backup job. Can't reclaim space held by the backup's snapshot unless the volume allows it — see "Backup snapshots keep deleted blocks" below. |
 | `ingress.yaml` | Longhorn's own UI, at `longhorn.lab.example.com` — forward-auth annotations, see the authentik README's "How apps get protected". |
@@ -107,8 +110,7 @@ mechanism and how to send a manual test alert.
 Longhorn's backup pods run as root; NFS `root_squash` (the default) maps root to an
 anonymous/unprivileged user that can't create the `backupstore` directory on first backup. See
 [docs/external-dependencies.md](../../../../docs/external-dependencies.md) for the exact fix
-(`no_root_squash`, or permissive folder permissions matching the ZFS datasets used by
-democratic-csi). Without it, backups fail silently — invisible from `kubectl` alone, since the
+(`no_root_squash`, or permissive `777` folder permissions). Without it, backups fail silently — invisible from `kubectl` alone, since the
 `RecurringJob` object itself looks fine.
 
 ## Common tasks

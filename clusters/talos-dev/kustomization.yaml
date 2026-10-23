@@ -15,7 +15,6 @@ resources:
   - networking/cert-manager-issuers-kustomization.yaml
   - networking/cloudflare-tunnel
   # storage
-  - storage/democratic-csi
   - storage/longhorn
   # secrets
   - security/sealed-secrets

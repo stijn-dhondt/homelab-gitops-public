@@ -38,8 +38,7 @@ backup runs. On a fresh NAS, this share needs either:
 
 - `no_root_squash` enabled on the `/Longhorn` NFS export, **or**
 - permissions on the underlying folder that allow the anonymous/nobody user to write (e.g.
-  `chmod 777`, matching the permissive `datasetPermissionsMode: "0777"` already used for the
-  democratic-csi ZFS datasets)
+  `chmod 777`)
 
 Without this, every backup fails with `mkdir .../backupstore: permission denied`, and it's
 invisible from `kubectl` alone — the `RecurringJob` just silently never produces a working backup.
