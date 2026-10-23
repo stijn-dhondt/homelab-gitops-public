@@ -14,14 +14,18 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["^clusters/talos-dev/talos-version\\.yaml$"],
+      "managerFilePatterns": [
+        "/^clusters/talos-dev/talos-version\\.yaml$/"
+      ],
       "matchStrings": [
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\s+talosVersion:\\s*(?<currentValue>v?\\d+\\.\\d+\\.\\d+)"
       ]
     },
     {
       "customType": "regex",
-      "fileMatch": ["^clusters/talos-dev/apps/n8n/helmrelease\\.ya?ml$"],
+      "managerFilePatterns": [
+        "/^clusters/talos-dev/apps/n8n/helmrelease\\.ya?ml$/"
+      ],
       "matchStrings": [
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?) versioning=(?<versioning>.*?)\\s+tag:\\s*[\"'](?<currentValue>\\d+\\.\\d+\\.\\d+)[\"']"
       ]
