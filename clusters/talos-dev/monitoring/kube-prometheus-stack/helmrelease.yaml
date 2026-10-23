@@ -26,6 +26,11 @@ spec:
     prometheus:
       prometheusSpec:
         retention: 31d
+        # Size cap on top of the 31d age limit (added 2026-10-23): whichever is hit first
+        # wins, so new scrape targets make Prometheus drop its oldest blocks instead of
+        # filling the 35Gi volume. TSDB was ~22.4GB of blocks at the time, stable since
+        # the 31d window filled up. Counts blocks + WAL, so keep it well under the PVC.
+        retentionSize: 25GB
         storageSpec:
           volumeClaimTemplate:
             spec:
@@ -39,6 +44,12 @@ spec:
               # won't let you change storageClassName on an already-bound PVC, so the
               # existing volume was migrated live via a Longhorn Volume CR patch instead
               # (numberOfReplicas 3->1, dataLocality disabled->strict-local).
+              #
+              # Same for unmapMarkSnapChainRemoved=enabled (patched live 2026-10-23): the
+              # nightly backup's snapshot kept every block the TSDB ever deleted (39.8GB on
+              # disk for ~23GB of data), and the 03:00 filesystem-trim may only reclaim it
+              # if it's allowed to remove that snapshot. Not set on the StorageClass, since
+              # its parameters are immutable - re-patch the Volume CR if this PVC is recreated.
               storageClassName: longhorn-single-replica
               accessModes: ["ReadWriteOnce"]
               resources:
