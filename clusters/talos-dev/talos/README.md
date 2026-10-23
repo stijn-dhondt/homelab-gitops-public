@@ -123,17 +123,17 @@ than something to keep in sync going forward.
 ## Current resolved schematic
 
 Output of the Factory API call described above, for the `schematic.yaml` currently in this folder
-(Talos `v1.13.6`, `iscsi-tools` + `util-linux-tools`):
+(Talos `v1.14.4`, `iscsi-tools` + `util-linux-tools`):
 
 ```
-https://factory.talos.dev/?arch=amd64&platform=metal&schematic-id=613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245&target=metal&version=1.13.6
+https://factory.talos.dev/?arch=amd64&platform=metal&schematic-id=613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245&target=metal&version=1.14.4
 
 Schema ID: 613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245
 
-talosctl upgrade --nodes 10.0.20.11 --image factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.13.6
-talosctl upgrade --nodes 10.0.20.12 --image factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.13.6
-talosctl upgrade --nodes 10.0.20.13 --image factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.13.6
-talosctl upgrade --nodes 10.0.20.21 --image factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.13.6
+talosctl upgrade --nodes 10.0.20.11 --image factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.14.4
+talosctl upgrade --nodes 10.0.20.12 --image factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.14.4
+talosctl upgrade --nodes 10.0.20.13 --image factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.14.4
+talosctl upgrade --nodes 10.0.20.21 --image factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.14.4
 ```
 
 ## Backing up and restoring etcd
