@@ -13,6 +13,14 @@ exits right after each `01:00` run, so by `02:00` it's typically detached. Witho
 the nightly `RecurringJob` would silently skip it instead of attaching it to take the backup — that
 was issue #15. That setting is what actually makes "rides along for free" true here.
 
+It's deliberately not covered by Longhorn's `nightly-trim`, though: Longhorn only attaches a
+detached volume for snapshot and backup jobs, and a filesystem trim needs it mounted, so the trim
+failed on this volume every night and (since Longhorn 1.13) failed the whole `nightly-trim` Job
+(`KubeJobFailed`). `pvc.yaml` therefore labels the PVC `recurring-job.longhorn.io/source: enabled`
+and `recurring-job.longhorn.io/nightly-backup: enabled`, which replace the volume's own
+recurring-job labels: it keeps the nightly backup and leaves the `default` group (and the trim).
+See `storage/longhorn/README.md`.
+
 - **Namespace:** `cluster-backup`
 - **Storage:** 2Gi on Longhorn (an etcd snapshot on this cluster is ~85MB; plenty of headroom)
 - **Schedule:** `01:00` daily — an hour before Longhorn's own `02:00` nightly backup run

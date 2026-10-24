@@ -40,6 +40,15 @@ that has already completed, like `cluster-backup-data` — see `backup/cluster-b
 currently-detached volume gets attached just long enough for its scheduled job, then detached
 again.
 
+That attach only happens for snapshot and backup jobs. `nightly-trim` needs the filesystem mounted
+by a workload, so on a detached volume it fails with `Action [trimFilesystem] not available` — and
+since Longhorn 1.13 one failed volume fails the whole `nightly-trim` Job and fires `KubeJobFailed`.
+That happened every night from 2026-10-06 to 2026-10-24 because of `cluster-backup-data`. A volume
+that's detached most of the time should therefore leave the `default` group: label its PVC with
+`recurring-job.longhorn.io/source: enabled` plus only the jobs it needs (e.g.
+`recurring-job.longhorn.io/nightly-backup: enabled`) — with the `source` label, the PVC's
+recurring-job labels replace the volume's own. See `backup/cluster-backup/pvc.yaml`.
+
 ## Backup snapshots keep deleted blocks
 
 Every `nightly-backup` run takes a Longhorn snapshot first and keeps it on the volume as the base
