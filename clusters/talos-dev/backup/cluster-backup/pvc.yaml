@@ -3,6 +3,12 @@ kind: PersistentVolumeClaim
 metadata:
   name: cluster-backup-data
   namespace: cluster-backup
+  labels:
+    # Longhorn: these replace the volume's own recurring-job labels, taking it out of
+    # the "default" group (whose nightly-trim always fails on this mostly-detached
+    # volume) and keeping only nightly-backup. See storage/longhorn/README.md.
+    recurring-job.longhorn.io/source: enabled
+    recurring-job.longhorn.io/nightly-backup: enabled
 spec:
   accessModes:
     - ReadWriteOnce
