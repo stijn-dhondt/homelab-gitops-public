@@ -9,8 +9,9 @@
 #   - talosVersion: run `talosctl upgrade` for each node with the new version, using
 #     the schematic ID recorded in that folder's README.
 #   - kubernetesVersion: run `talosctl upgrade-k8s --to <version>` once against a
-#     control-plane node. Minor bumps wait for approval on Renovate's Dependency
-#     Dashboard - check the Talos support matrix for the running Talos release first.
+#     control-plane node. Minor bumps are capped by `allowedVersions` in renovate.json
+#     (held below 1.37 until Cilium supports it) and then wait for approval on
+#     Renovate's Dependency Dashboard - check the Talos and Cilium support matrices first.
 #
 # Keep each `# renovate:` comment directly above its `...Version:` line, with no other
 # comment lines in between (blank lines are fine) - the customManager regex in
@@ -19,4 +20,4 @@
 talosVersion: v1.14.4
 
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
-kubernetesVersion: v1.37.1
+kubernetesVersion: v1.36.0

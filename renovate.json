@@ -66,6 +66,13 @@
       "groupName": "Talos"
     },
     {
+      "description": "Hold Kubernetes below 1.37 until Cilium (CNI and kube-proxy replacement) supports it. Unlike dashboard approval, a checkbox can't bypass this; raise the cap to allow the next minor",
+      "matchPackageNames": [
+        "kubernetes/kubernetes"
+      ],
+      "allowedVersions": "<1.37.0"
+    },
+    {
       "description": "A Kubernetes minor bump has to fit the running Talos release's support matrix, so wait for approval on the Dependency Dashboard",
       "matchPackageNames": [
         "kubernetes/kubernetes"
