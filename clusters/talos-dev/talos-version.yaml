@@ -1,15 +1,22 @@
-# This file exists purely so Renovate can track the Talos OS version running on the
-# cluster nodes and open a PR when a new siderolabs/talos release ships. Nothing reads
-# or applies this value automatically - it's a version pin/reminder, not a config source.
+# This file exists purely so Renovate can track the Talos OS and Kubernetes versions
+# running on the cluster nodes and open a PR when a new siderolabs/talos or
+# kubernetes/kubernetes release ships. Nothing reads or applies these values
+# automatically - they're version pins/reminders, not a config source.
 #
 # When Renovate bumps this file, it does NOT upgrade the cluster by itself: Talos machine
 # config lives outside Flux's reach (see clusters/talos-dev/talos/README.md) and is only
-# ever applied by hand, via `talosctl upgrade`, using the schematic ID recorded in that
-# folder's README. After merging a bump here, go run the matching `talosctl upgrade`
-# command for each node with the new version.
+# ever applied by hand. After merging a bump here:
+#   - talosVersion: run `talosctl upgrade` for each node with the new version, using
+#     the schematic ID recorded in that folder's README.
+#   - kubernetesVersion: run `talosctl upgrade-k8s --to <version>` once against a
+#     control-plane node. Minor bumps wait for approval on Renovate's Dependency
+#     Dashboard - check the Talos support matrix for the running Talos release first.
 #
-# Keep the `# renovate:` comment directly above `talosVersion:`, with no other comment
-# lines in between (blank lines are fine) - the customManager regex in renovate.json
-# requires them adjacent to match.
+# Keep each `# renovate:` comment directly above its `...Version:` line, with no other
+# comment lines in between (blank lines are fine) - the customManager regex in
+# renovate.json requires them adjacent to match.
 # renovate: datasource=github-releases depName=siderolabs/talos
 talosVersion: v1.14.4
+
+# renovate: datasource=github-releases depName=kubernetes/kubernetes
+kubernetesVersion: v1.36.0

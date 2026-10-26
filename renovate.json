@@ -23,7 +23,7 @@
         "/^clusters/talos-dev/talos-version\\.yaml$/"
       ],
       "matchStrings": [
-        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\s+talosVersion:\\s*(?<currentValue>v?\\d+\\.\\d+\\.\\d+)"
+        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\s+(?:talos|kubernetes)Version:\\s*(?<currentValue>v?\\d+\\.\\d+\\.\\d+)"
       ]
     },
     {
@@ -34,6 +34,47 @@
       "matchStrings": [
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?) versioning=(?<versioning>.*?)\\s+tag:\\s*[\"'](?<currentValue>\\d+\\.\\d+\\.\\d+)[\"']"
       ]
+    },
+    {
+      "customType": "regex",
+      "description": "Digest-pinned images in HelmRelease values: a '# renovate:' comment directly above tag + digest",
+      "managerFilePatterns": [
+        "/(?:^|/)helmrelease\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+tag:\\s*[\"']?(?<currentValue>[^\\s\"']+)[\"']?\\s+digest:\\s*[\"'](?<currentDigest>sha256:[a-f0-9]{64})[\"']"
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Flux controllers are upgraded as one unit by the flux manager; don't bump single controller images",
+      "matchManagers": [
+        "kubernetes"
+      ],
+      "matchFileNames": [
+        "**/gotk-components.yaml"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "talosctl must match the Talos version running on the nodes",
+      "matchPackageNames": [
+        "siderolabs/talos",
+        "ghcr.io/siderolabs/talosctl"
+      ],
+      "groupName": "Talos"
+    },
+    {
+      "description": "A Kubernetes minor bump has to fit the running Talos release's support matrix, so wait for approval on the Dependency Dashboard",
+      "matchPackageNames": [
+        "kubernetes/kubernetes"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "dependencyDashboardApproval": true
     }
   ]
 }
