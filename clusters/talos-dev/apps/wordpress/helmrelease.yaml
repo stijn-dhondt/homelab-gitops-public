@@ -59,10 +59,13 @@ spec:
       # Same stale-"latest" problem as the WordPress image above, and Bitnami only
       # publishes free images as "latest". Pin the digest so upgrades arrive as
       # Renovate PRs; the tag is only there for Renovate to look up new digests.
+      # Rolled back to MariaDB 12.3.2: digest 6871818 (MariaDB 13.1.1) crash-looped
+      # on liveness/readiness probe timeouts (1s) after the 2026-11-09 upgrade.
+      # Review major MariaDB upgrades by hand instead of merging the digest bump.
       image:
         # renovate: datasource=docker depName=docker.io/bitnami/mariadb
         tag: "latest"
-        digest: "sha256:687181819d6e3f04124a21aec1aeef1d8a5d6a924c0d8e8f0cf66b8f0ce15a7c"
+        digest: "sha256:a1b946eaefe2da489f518daf6b00493b873b4593f3fe650658725a0a799f5e7b"
       auth:
         existingSecret: wordpress-mariadb-credentials
       primary:
