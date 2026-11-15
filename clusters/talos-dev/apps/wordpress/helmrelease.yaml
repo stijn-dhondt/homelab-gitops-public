@@ -77,7 +77,7 @@ spec:
         image:
           # renovate: datasource=docker depName=docker.io/bitnami/mysqld-exporter
           tag: "latest"
-          digest: "sha256:44e991d8a4fb886e74da42e40d380117e4f63d48bd1c46d77ead976c188bbadc"
+          digest: "sha256:6d49e9b6da985db2a70d932076ed465fa8aefe16f8514443fc92724eae46bea6"
         # Enables the "Process States" / "Top Process States Hourly" panels on
         # the MySQL Overview Grafana dashboard (mysql_info_schema_threads is
         # otherwise never exported).
