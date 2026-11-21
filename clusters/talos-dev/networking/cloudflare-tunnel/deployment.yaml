@@ -16,7 +16,7 @@ spec:
       serviceAccountName: cloudflare-tunnel
       containers:
         - name: cloudflared
-          image: cloudflare/cloudflared:2026.11.0
+          image: cloudflare/cloudflared:2026.11.1
           command: ["cloudflared", "tunnel", "--config", "/etc/cloudflared/config.yml", "run"]
           volumeMounts:
             - name: config
